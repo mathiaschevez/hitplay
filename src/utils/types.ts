@@ -7,3 +7,8 @@ export type Playlist = {
     width: number,
   }[] 
 }
+
+export type Track = {
+  id: string
+  name: string
+}

@@ -4,7 +4,6 @@ import { type Playlist } from '~/utils/types'
 
 export function Playlist({ playlist } : { playlist: Playlist }) {
   const playlistImage = playlist.images[0]
-  console.log(playlistImage, 'here')
   
   return (
     <div className='border p-3 rounded'>
