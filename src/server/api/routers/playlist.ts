@@ -5,6 +5,14 @@ import {
   // protectedProcedure,
 } from "~/server/api/trpc";
 
+type Item = {
+  name: string
+}
+
+interface PlaylistsData {
+  items: Item[]
+}
+
 const client_id = process.env.SPOTIFY_CLIENT_ID ?? ''
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET ?? ''
 const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
@@ -16,9 +24,17 @@ export const playlistRouter = createTRPCRouter({
   .query(async ({ ctx }) => {
     const accounts = await ctx.prisma.account.findMany();
 
-    const res = await getUsersPlaylists(accounts[0]?.refresh_token ?? '')
-    return res.json()
+    const userPlaylists = await getUsersPlaylists(accounts[0]?.refresh_token ?? '')
+
+    return userPlaylists.items
   }),
+  // getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+  //   return ctx.prisma.user.findFirst({
+  //     where: {
+  //       id: input,
+  //     },
+  //   });
+  // }),
 });
 
 export const getAccessToken = async (refresh_token: string): Promise<{access_token: string}> => {
@@ -34,15 +50,17 @@ export const getAccessToken = async (refresh_token: string): Promise<{access_tok
     }),
   });
 
-  return response.json()
+  return response.json() as Promise<{access_token: string}>
 };
 
 export const getUsersPlaylists = async (refresh_token: string) => {
   const { access_token } = await getAccessToken(refresh_token);
 
-  return fetch(PLAYLISTS_ENDPOINT, {
+  const userPlaylists = await(await fetch(PLAYLISTS_ENDPOINT, {
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
-  });
+  })).json() as PlaylistsData
+
+  return userPlaylists
 };

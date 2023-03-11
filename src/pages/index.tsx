@@ -4,11 +4,10 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 
+
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const playlists = api.playlist.getPlaylists.useQuery()
-
-  console.log(playlists.data, 'playlists')
 
   return (
     <>
@@ -47,7 +46,7 @@ const Home: NextPage = () => {
             </Link>
           </div>
           {playlists.data && 
-            playlists.data.items.map((p, i: number) => (
+            playlists.data.map((p, i: number) => (
               <div className='text-white' key={i}>
                 {p.name}
               </div>
