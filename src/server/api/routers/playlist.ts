@@ -4,13 +4,9 @@ import {
   publicProcedure,
   // protectedProcedure,
 } from "~/server/api/trpc";
-
-type Item = {
-  name: string
-}
-
+import { type Playlist } from "~/utils/types";
 interface PlaylistsData {
-  items: Item[]
+  items: Playlist[]
 }
 
 const client_id = process.env.SPOTIFY_CLIENT_ID ?? ''
@@ -23,7 +19,6 @@ export const playlistRouter = createTRPCRouter({
   getPlaylists: publicProcedure
   .query(async ({ ctx }) => {
     const accounts = await ctx.prisma.account.findMany();
-
     const userPlaylists = await getUsersPlaylists(accounts[0]?.refresh_token ?? '')
 
     return userPlaylists.items

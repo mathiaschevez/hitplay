@@ -9,7 +9,34 @@
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.scdn.co',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'mosaic.scdn.co',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'seed-mix-image.spotifycdn.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'wrapped-images.spotifycdn.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   /**
    * If you have the "experimental: { appDir: true }" setting enabled, then you
    * must comment the below `i18n` config out.
