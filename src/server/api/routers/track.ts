@@ -28,6 +28,7 @@ export const trackRouter = createTRPCRouter({
     const track = await getTrack(account?.refresh_token ?? '')
     return track
   }),
+  
   getTracksByPlaylist: publicProcedure
   .input(z.object({ userId: z.string(), playlistId: z.string() }))
   .query(async ({ ctx, input }) => {
@@ -41,6 +42,7 @@ export const trackRouter = createTRPCRouter({
     const tracks = await getTracksByPlaylist(account?.refresh_token ?? '', input.playlistId)
     return tracks.items ?? []
   })
+
   // getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
   //   return ctx.prisma.user.findFirst({
   //     where: {

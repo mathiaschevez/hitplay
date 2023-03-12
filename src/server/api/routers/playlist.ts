@@ -28,6 +28,7 @@ export const playlistRouter = createTRPCRouter({
     const userPlaylists = await getUsersPlaylists(account?.refresh_token ?? '')
     return userPlaylists.items
   }),
+
   getPlaylistById: publicProcedure
   .input(z.object({ userId: z.string(), playlistId: z.string() }))
   .query(async ({ ctx, input }) => {
@@ -43,7 +44,7 @@ export const playlistRouter = createTRPCRouter({
   }),
 });
 
-export const getUsersPlaylists = async (refresh_token: string) => {
+async function getUsersPlaylists(refresh_token: string) {
   const { access_token } = await getAccessToken(refresh_token);
 
   const userPlaylists = await(await fetch(PLAYLISTS_ENDPOINT, {
@@ -53,9 +54,9 @@ export const getUsersPlaylists = async (refresh_token: string) => {
   })).json() as PlaylistsData
 
   return userPlaylists
-};
+}
 
-export const getPlaylistById = async (refresh_token: string, playlistId: string) => {
+async function getPlaylistById(refresh_token: string, playlistId: string) {
   const { access_token } = await getAccessToken(refresh_token)
 
   const playlist = await(await fetch(PLAYLIST_BY_ID_ENDPOINT(playlistId), {

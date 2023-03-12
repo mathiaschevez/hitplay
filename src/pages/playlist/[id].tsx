@@ -5,13 +5,15 @@ import React, { useEffect, useState } from 'react'
 import { api } from '~/utils/api'
 import { type PlaylistTrack } from '~/utils/types';
 import { FaArrowCircleUp, FaArrowCircleDown } from 'react-icons/fa'
+import { type NextPage } from 'next';
 
-const PlaylistPage = () => {
+const PlaylistPage: NextPage = () => {
   const router = useRouter()
   const id = router.query.id as string
 
   const { data: sessionData } = useSession();
   const { data: tracks } = api.track.getTracksByPlaylist.useQuery({ userId: sessionData?.user.id ?? '', playlistId: id ?? ''})
+  
   const [topTrack, setTopTrack] = useState<PlaylistTrack>()
   const [trackList, setTrackList] = useState<PlaylistTrack[]>()
 
@@ -77,6 +79,7 @@ function Track({ playlistTrack, trackList, setTrackList, setTopTrack } : { playl
   function updateTrackList(direction: string, trackId: string) {
     let updatedTrackList: PlaylistTrack[] = []
     const index = trackList.map(t => t.track.id).indexOf(trackId)
+
     updatedTrackList = trackList.filter((t) => t.track.id !== trackId)
 
     if(direction === 'up') {
