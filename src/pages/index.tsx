@@ -12,7 +12,6 @@ import Link from 'next/link';
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
-
   const { data: playlists} = api.playlist.getPlaylists.useQuery(sessionData?.user.id ?? '');
 
   return (

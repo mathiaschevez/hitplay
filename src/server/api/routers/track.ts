@@ -5,14 +5,11 @@ import {
   // protectedProcedure,
 } from "~/server/api/trpc";
 import { getAccessToken } from "~/utils/api";
-import { type Track } from "~/utils/types";
+import { type PlaylistTrack, type Track } from "~/utils/types";
 
 const TRACK_ENDPOINT = 'https://api.spotify.com/v1/tracks/6rPO02ozF3bM7NnOV4h6s2';
 const TRACKS_BY_PLAYLIST_ENDPOINT = (playlist_id: string) => `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`
 
-type PlaylistTrack = {
-  track: Track
-}
 interface PlaylistTracksData {
   items: PlaylistTrack[]
 }

@@ -16,4 +16,13 @@ export type Track = {
     name: string
   }[]
   preview_url: string
+  album: {
+    images: {
+      url: string
+    }[]
+  }
+}
+
+export type PlaylistTrack = {
+  track: Track
 }
