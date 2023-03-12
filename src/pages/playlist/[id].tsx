@@ -25,9 +25,9 @@ const PlaylistPage: NextPage = () => {
 
   return (
     <div className='min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c]'>
-      <div className='p-32'>
+      <div className='py-16 px-32'>
         {!tracks ?
-          <div>Nothing Here</div> :
+          <div className='text-white'>Loading...</div> :
           <div className='flex flex-col gap-12 justify-center'>
             <div className='flex flex-col gap-6'>
               <h1 className='text-4xl text-white font-extrabold'>#1 RANKED TRACK FOR THIS PLAYLIST</h1>

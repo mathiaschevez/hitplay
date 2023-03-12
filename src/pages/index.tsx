@@ -9,6 +9,7 @@ import { Tabs } from 'antd'
 import { api } from "~/utils/api";
 import { type Playlist } from '~/utils/types'
 import Link from 'next/link';
+import { Layout } from '~/components/Layout';
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -21,20 +22,22 @@ const Home: NextPage = () => {
         <meta name="description" content="Find the best music for your playlists" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1 className="text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]">Hitplay</h1>
-          {/* <HomeTabs /> */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            { playlists && 
-              playlists.map(p => (
-                <Playlist key={p.id} playlist={p} />
-              ))
-            }
+      <Layout>
+        <main>
+          <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+            <h1 className="text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]">Hitplay</h1>
+            {/* <HomeTabs /> */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              { playlists && 
+                playlists.map(p => (
+                  <Playlist key={p.id} playlist={p} />
+                ))
+              }
+            </div>
+            <AuthShowcase />
           </div>
-          <AuthShowcase />
-        </div>
-      </main>
+        </main>
+      </Layout>
     </>
   );
 };
