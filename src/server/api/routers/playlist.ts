@@ -1,52 +1,47 @@
-// import { z } from 'zod';
+import { z } from 'zod';
 import {
   createTRPCRouter,
   publicProcedure,
   // protectedProcedure,
 } from "~/server/api/trpc";
+import { getAccessToken } from "~/utils/api";
 import { type Playlist } from "~/utils/types";
+
+const PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/me/playlists';
+const PLAYLIST_BY_ID_ENDPOINT = (playlist_id: string) => `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`
+
 interface PlaylistsData {
   items: Playlist[]
 }
 
-const client_id = process.env.SPOTIFY_CLIENT_ID ?? ''
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET ?? ''
-const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
-const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
-const PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/me/playlists';
-
 export const playlistRouter = createTRPCRouter({
   getPlaylists: publicProcedure
-  .query(async ({ ctx }) => {
-    const accounts = await ctx.prisma.account.findMany();
-    const userPlaylists = await getUsersPlaylists(accounts[0]?.refresh_token ?? '')
+  .input(z.string() || z.null())
+  .query(async ({ ctx, input }) => {
+    if(!input) return null
+    const account = await ctx.prisma.account.findFirst({
+      where: {
+        userId: input
+      }
+    });
 
+    const userPlaylists = await getUsersPlaylists(account?.refresh_token ?? '')
     return userPlaylists.items
   }),
-  // getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
-  //   return ctx.prisma.user.findFirst({
-  //     where: {
-  //       id: input,
-  //     },
-  //   });
-  // }),
+  getPlaylistById: publicProcedure
+  .input(z.object({ userId: z.string(), playlistId: z.string() }))
+  .query(async ({ ctx, input }) => {
+    if(!input) return null
+    const account = await ctx.prisma.account.findFirst({
+      where: {
+        userId: input.userId
+      }
+    });
+
+    const playlist = await getPlaylistById(account?.refresh_token ?? '', input.playlistId)
+    return playlist
+  }),
 });
-
-export const getAccessToken = async (refresh_token: string): Promise<{access_token: string}> => {
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token,
-    }),
-  });
-
-  return response.json() as Promise<{access_token: string}>
-};
 
 export const getUsersPlaylists = async (refresh_token: string) => {
   const { access_token } = await getAccessToken(refresh_token);
@@ -59,3 +54,15 @@ export const getUsersPlaylists = async (refresh_token: string) => {
 
   return userPlaylists
 };
+
+export const getPlaylistById = async (refresh_token: string, playlistId: string) => {
+  const { access_token } = await getAccessToken(refresh_token)
+
+  const playlist = await(await fetch(PLAYLIST_BY_ID_ENDPOINT(playlistId), {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  })).json() as PlaylistsData
+
+  return playlist
+}

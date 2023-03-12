@@ -11,4 +11,9 @@ export type Playlist = {
 export type Track = {
   id: string
   name: string
+  artists: {
+    id: string
+    name: string
+  }[]
+  preview_url: string
 }

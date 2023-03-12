@@ -1,27 +1,49 @@
-// import { z } from 'zod';
+import { z } from 'zod';
 import {
   createTRPCRouter,
   publicProcedure,
   // protectedProcedure,
 } from "~/server/api/trpc";
+import { getAccessToken } from "~/utils/api";
 import { type Track } from "~/utils/types";
-const client_id = process.env.SPOTIFY_CLIENT_ID ?? ''
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET ?? ''
-const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
 
-const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
-const TRACKS_ENDPOINT = 'https://api.spotify.com/v1/tracks/6rPO02ozF3bM7NnOV4h6s2';
+const TRACK_ENDPOINT = 'https://api.spotify.com/v1/tracks/6rPO02ozF3bM7NnOV4h6s2';
+const TRACKS_BY_PLAYLIST_ENDPOINT = (playlist_id: string) => `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`
+
+type PlaylistTrack = {
+  track: Track
+}
+interface PlaylistTracksData {
+  items: PlaylistTrack[]
+}
 
 export const trackRouter = createTRPCRouter({
-  getTracks: publicProcedure
-  .query(async ({ ctx }) => {  
-    const accounts = await ctx.prisma.account.findMany();
-    const track = await getTrack(accounts[0]?.refresh_token ?? '')
+  getTrack: publicProcedure
+  .input(z.string() || z.null())
+  .query(async ({ ctx, input }) => {
+    if(!input) return null
+    const account = await ctx.prisma.account.findFirst({
+      where: {
+        userId: input
+      }
+    });
 
-    console.log(track, 'here')
-
+    const track = await getTrack(account?.refresh_token ?? '')
     return track
   }),
+  getTracksByPlaylist: publicProcedure
+  .input(z.object({ userId: z.string(), playlistId: z.string() }))
+  .query(async ({ ctx, input }) => {
+    if(!input) return null
+    const account = await ctx.prisma.account.findFirst({
+      where: {
+        userId: input.userId
+      }
+    });
+
+    const tracks = await getTracksByPlaylist(account?.refresh_token ?? '', input.playlistId)
+    return tracks.items
+  })
   // getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
   //   return ctx.prisma.user.findFirst({
   //     where: {
@@ -31,43 +53,26 @@ export const trackRouter = createTRPCRouter({
   // }),
 });
 
-export const getAccessToken = async (refresh_token: string): Promise<{access_token: string}> => {
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refresh_token,
-    }),
-  });
-
-  return response.json() as Promise<{access_token: string}>
-};
-
-
-// export const getTracks = async (refresh_token: string) => {
-//   const { access_token } = await getAccessToken(refresh_token);
-
-//   const trackOne = await fetch(TRACKS_ENDPOINT, {
-//     headers: {
-//       Authorization: `Bearer ${access_token}`,
-//     },
-//   })
-
-//   return trackOne.json()
-// };
-
-export const getTrack = async (refresh_token: string) => {
+async function getTracksByPlaylist(refresh_token: string, playlistId: string) {
   const { access_token } = await getAccessToken(refresh_token);
 
-  const tracks = await(await fetch(TRACKS_ENDPOINT, {
+  const tracks = await(await fetch(TRACKS_BY_PLAYLIST_ENDPOINT(playlistId), {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  })).json() as PlaylistTracksData
+
+  return tracks
+}
+
+async function getTrack(refresh_token: string) {
+  const { access_token } = await getAccessToken(refresh_token);
+
+  const track = await(await fetch(TRACK_ENDPOINT, {
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
   })).json() as Track
 
-  return tracks
-};
+  return track
+}

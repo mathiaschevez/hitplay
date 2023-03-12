@@ -1,12 +1,19 @@
-import { type NextPage } from "next";
+import React, { useState } from 'react'
+import Image from 'next/image'
 import Head from "next/head";
+import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
+
+import type { TabsProps } from 'antd'
+import { Tabs } from 'antd'
 import { api } from "~/utils/api";
-import { Playlist } from "~/components/Playlist";
-import { HomeTabs } from "~/components/HomeTabs";
+import { type Playlist } from '~/utils/types'
+import Link from 'next/link';
 
 const Home: NextPage = () => {
-  const playlists = api.playlist.getPlaylists.useQuery()
+  const { data: sessionData } = useSession();
+
+  const { data: playlists} = api.playlist.getPlaylists.useQuery(sessionData?.user.id ?? '');
 
   return (
     <>
@@ -20,10 +27,10 @@ const Home: NextPage = () => {
           <h1 className="text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]">
             HitPlay
           </h1>
-          <HomeTabs />
+          {/* <HomeTabs /> */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {playlists.data && 
-              playlists.data.map(p => (
+            {playlists && 
+              playlists.map(p => (
                 <Playlist key={p.id} playlist={p} />
               ))
             }
@@ -36,6 +43,60 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export function HomeTabs() {
+  const [activeTab, setActiveTab] = useState('1')
+
+  const tabItems: TabsProps['items'] = [
+    {
+      key: '1',
+      label: `Songs`,
+      children: <Tracks />,
+    },
+    {
+      key: '2',
+      label: `Albums`,
+      children: `Content of Tab Pane 2`,
+    },
+    {
+      key: '3',
+      label: `Artists`,
+      children: `Content of Tab Pane 3`,
+    },
+  ];
+
+  return (
+    <Tabs 
+      className='w-full' 
+      activeKey={activeTab} 
+      items={tabItems} 
+      onChange={(e) => setActiveTab(e)} 
+    />
+  )
+}
+
+export function Tracks() {
+  const { data: sessionData } = useSession();
+  const { data: track } = api.track.getTrack.useQuery(sessionData?.user.id ?? '');
+
+  return (
+    track ? 
+      <div>{track.name}</div> :
+      <div>Track not found</div>
+  )
+}
+
+
+export function Playlist({ playlist } : { playlist: Playlist }) {
+  const playlistImage = playlist.images[0]
+  
+  return (
+    <Link href={`/playlist/${playlist.id}`} className='border p-3 rounded'>
+      {playlistImage && <Image alt={playlist.name} src={playlistImage.url} width={300} height={300} />}
+      <h1 className='text-white text-lg'>{playlist.name}</h1>
+    </Link>
+  )
+}
 
 const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
