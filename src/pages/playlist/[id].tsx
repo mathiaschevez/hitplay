@@ -83,9 +83,11 @@ function Track({ playlistTrack, trackList, setTrackList, setTopTrack } : { playl
     updatedTrackList = trackList.filter((t) => t.track.id !== trackId)
 
     if(direction === 'up') {
+      // could possibly just insert at this index instead?
       updatedTrackList.splice(index - 1 , 0, playlistTrack)
       if(index === 1) setTopTrack(playlistTrack)
     } else {
+      // could possibly just insert at this index instead?
       updatedTrackList.splice(index + 1, 0, playlistTrack)
     }
 
