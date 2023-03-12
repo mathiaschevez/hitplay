@@ -1,13 +1,3 @@
-export type Playlist = {
-  id: string
-  name: string
-  images: {
-    url: string,
-    height: number,
-    width: number,
-  }[] 
-}
-
 export type Track = {
   id: string
   name: string
@@ -25,4 +15,22 @@ export type Track = {
 
 export type PlaylistTrack = {
   track: Track
+}
+
+export type Playlist = {
+  id: string
+  name: string
+  images: {
+    url: string,
+    height: number,
+    width: number,
+  }[] 
+}
+
+export type Artist = {
+  id: string
+  name: string
+  images: {
+    url: string
+  }[]
 }

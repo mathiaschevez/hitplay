@@ -1,25 +1,34 @@
 import { Avatar, Tabs, type TabsProps } from 'antd'
+import { type NextPage } from 'next'
 import { useSession } from 'next-auth/react'
+import Head from 'next/head'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { api } from '~/utils/api'
 import { type Track } from '~/utils/types'
 
-const ProfilePage = () => {
+const ProfilePage: NextPage = () => {
   const { data: sessionData } = useSession()
   // const { data: user } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
 
   return (
-    <div className='w-full flex-1'>
-      <div className='flex p-8 pb-0 gap-9'>
-        <Avatar src={sessionData?.user.image} size={200}/>
-        <div>
-          <h1 className='text-white font-bold text-3xl'>{sessionData?.user.name}</h1>
-          <h1 className='text-white text-xl font-semibold'>{sessionData?.user.email}</h1>
+    <>
+      <Head>
+        <title>Profile</title>
+        <meta name='description" content="Find the best music for your playlists' />
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+      <main className='w-full flex-1'>
+        <div className='flex p-8 pb-0 gap-9'>
+          <Avatar src={sessionData?.user.image} size={200}/>
+          <div>
+            <h1 className='text-white font-bold text-3xl'>{sessionData?.user.name}</h1>
+            <h1 className='text-white text-xl font-semibold'>{sessionData?.user.email}</h1>
+          </div>
         </div>
-      </div>
-      <ProfileTabs />
-    </div>
+        <ProfileTabs />
+      </main>
+    </>
   )
 }
 
@@ -36,13 +45,8 @@ function ProfileTabs() {
     },
     {
       key: '2',
-      label: `Your Top Albums`,
-      children: `Fetch user albums and sort them by play percentage`,
-    },
-    {
-      key: '3',
       label: `Your Top Artists`,
-      children: `Fetch user artists and sort them by play percentage`,
+      children: <TopArtistsTab />,
     },
   ];
 
@@ -61,10 +65,8 @@ function TopTracksTab() {
   const { data: sessionData } = useSession()
   const { data: topTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
 
-  console.log(topTracks, 'topTracks')
-
   return (
-    <div className='grid grid-cols-4 gap-6 px-8'>
+    <div className='grid grid-cols-4 gap-6 px-8 pb-6'>
       {topTracks?.items.map((track, i: number) => (
         <TopTrack key={track.id} track={track} rank={i + 1} />
       ))}
@@ -76,9 +78,9 @@ function TopTrack({ track, rank } : { track: Track, rank: number }) {
   return (
     <div 
       style={{ backgroundColor: 'rgba(171, 119, 248, .25)' }} 
-      className='border flex p-3 rounded gap-3'
+      className='border-2 flex p-3 rounded gap-3'
     >
-      <h1>{ rank }.</h1>
+      <h1 className='font-bold'>{rank}.</h1>
       <div className='flex flex-col'>
         { track.album.images[0]?.url && <Image alt={track.name} src={track.album.images[0].url} width={200} height={200} /> }
         <h1 className='font-bold'>{track.name}</h1>
@@ -86,6 +88,18 @@ function TopTrack({ track, rank } : { track: Track, rank: number }) {
           <h1 key={artist.id}>{artist.name}</h1>
         ))}
       </div>
+    </div>
+  )
+}
+
+function TopArtistsTab() {
+  const { data: sessionData } = useSession()
+  const { data: topArtists } = api.user.getCurrentUserTopArtists.useQuery(sessionData?.user.id ?? '')
+
+
+  return (
+    <div>
+      here
     </div>
   )
 }

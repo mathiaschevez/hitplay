@@ -16,7 +16,7 @@ function Navbar() {
   const { data: sessionData } = useSession()
 
   return(
-    <div className='flex items-center w-screen justify-end gap-12 px-8 py-3'>
+    <div className='flex items-center w-full justify-end gap-12 px-8 py-3'>
       <Link href='/profile' className='text-white'>
         <Avatar src={sessionData?.user.image}/>
       </Link>
