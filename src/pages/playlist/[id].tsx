@@ -11,7 +11,7 @@ const PlaylistPage = () => {
   const id = router.query.id as string
 
   const { data: sessionData } = useSession();
-  const { data: tracks } = api.track.getTracksByPlaylist.useQuery({ userId: sessionData?.user.id ?? '', playlistId: id})
+  const { data: tracks } = api.track.getTracksByPlaylist.useQuery({ userId: sessionData?.user.id ?? '', playlistId: id ?? ''})
   const [topTrack, setTopTrack] = useState<PlaylistTrack>()
   const [trackList, setTrackList] = useState<PlaylistTrack[]>()
 

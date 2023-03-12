@@ -39,7 +39,7 @@ export const trackRouter = createTRPCRouter({
     });
 
     const tracks = await getTracksByPlaylist(account?.refresh_token ?? '', input.playlistId)
-    return tracks.items
+    return tracks.items ?? []
   })
   // getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
   //   return ctx.prisma.user.findFirst({
