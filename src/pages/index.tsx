@@ -90,7 +90,11 @@ export function Playlist({ playlist } : { playlist: Playlist }) {
   const playlistImage = playlist.images[0]
   
   return (
-    <Link href={`/playlist/${playlist.id}`} className='border p-3 rounded'>
+    <Link 
+      href={`/playlist/${playlist.id}`} 
+      className='border p-3 rounded'
+      style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
+    >
       {playlistImage && <Image alt={playlist.name} src={playlistImage.url} width={300} height={300} />}
       <h1 className='text-white text-lg'>{playlist.name}</h1>
     </Link>
