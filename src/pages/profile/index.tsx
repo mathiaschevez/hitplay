@@ -10,13 +10,12 @@ import { type Playlist, type Track } from '~/utils/types'
 
 const ProfilePage: NextPage = () => {
   const { data: sessionData } = useSession()
-  // const { data: user } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
 
   return (
     <>
       <Head>
         <title>Profile</title>
-        <meta name='description" content="Find the best music for your playlists' />
+        <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className='w-full flex-1'>
@@ -102,11 +101,13 @@ function TopArtistsTab() {
   const { data: sessionData } = useSession()
   const { data: topArtists } = api.user.getCurrentUserTopArtists.useQuery(sessionData?.user.id ?? '')
 
-  console.log(topArtists, 'top artists')
-
   return (
     <div>
-      here
+      {topArtists?.items.map(artist => (
+        <div key={artist.id}>
+          <h1>{artist.name}</h1>
+        </div>
+      ))}
     </div>
   )
 }
@@ -115,7 +116,6 @@ function PlaylistsTab() {
   const { data: sessionData } = useSession();
   const { data: playlists} = api.playlist.getPlaylists.useQuery(sessionData?.user.id ?? '');
 
-  console.log(playlists, 'playlists')
   return (
     <div>
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>

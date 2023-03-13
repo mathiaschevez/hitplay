@@ -23,22 +23,20 @@ const Home: NextPage = () => {
       setCurrentTracks([null,  null])
   }, [topOneHundredTracks])
 
-  console.log(currentTracks)
-
   return (
     <>
       <Head>
         <title>HitPlay</title>
-        <meta name='description" content="Find the best music for your playlists' />
+        <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main>
         <div className='container flex flex-col items-center justify-center gap-12 px-4 py-1'>
           <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
           {/* <HomeTabs /> */}
-          <div className='flex gap-12 w-full'>
+          <div className='flex flex-wrap gap-20 items-center justify-center'>
             {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map(track => (
-              <div key={track?.id} className='flex flex-col gap-6 w-1/2'>
+              <div key={track?.id} className='flex flex-col gap-6'>
                 <TrackCard track={track} />
                 <button
                   onClick={() => console.log(track.id)}

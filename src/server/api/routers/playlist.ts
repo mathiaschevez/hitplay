@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import {
-  createTRPCRouter,
-  publicProcedure,
-  // protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc"; // protectedProcedure,
 import { getAccessToken } from "~/utils/api";
 import { type Playlist } from "~/utils/types";
 
@@ -16,32 +12,32 @@ interface PlaylistsData {
 
 export const playlistRouter = createTRPCRouter({
   getPlaylists: publicProcedure
-  .input(z.string() || z.null())
-  .query(async ({ ctx, input }) => {
-    if(!input) return null
-    const account = await ctx.prisma.account.findFirst({
-      where: {
-        userId: input
-      }
-    });
+    .input(z.string() || z.null())
+    .query(async ({ ctx, input }) => {
+      if(!input) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input
+        }
+      });
 
-    const userPlaylists = await getUsersPlaylists(account?.refresh_token ?? '')
-    return userPlaylists.items
-  }),
+      const userPlaylists = await getUsersPlaylists(account?.refresh_token ?? '')
+      return userPlaylists.items
+    }),
 
   getPlaylistById: publicProcedure
-  .input(z.object({ userId: z.string(), playlistId: z.string() }))
-  .query(async ({ ctx, input }) => {
-    if(!input) return null
-    const account = await ctx.prisma.account.findFirst({
-      where: {
-        userId: input.userId
-      }
-    });
+    .input(z.object({ userId: z.string(), playlistId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if(!input) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input.userId
+        }
+      });
 
-    const playlist = await getPlaylistById(account?.refresh_token ?? '', input.playlistId)
-    return playlist
-  }),
+      const playlist = await getPlaylistById(account?.refresh_token ?? '', input.playlistId)
+      return playlist
+    }),
 });
 
 async function getUsersPlaylists(refresh_token: string) {

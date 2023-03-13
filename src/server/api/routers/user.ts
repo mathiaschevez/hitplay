@@ -23,46 +23,46 @@ interface UserTopAlbumsData {
 
 export const userRouter = createTRPCRouter({
   getCurrentUser: publicProcedure
-  .input(z.string() || z.null())
-  .query(async ({ ctx, input }) => {
-    if(!input) return null
-    const account = await ctx.prisma.account.findFirst({
-      where: {
-        userId: input
-      }
-    });
+    .input(z.string() || z.null())
+    .query(async ({ ctx, input }) => {
+      if(!input) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input
+        }
+      });
 
-    const user = await getCurrentUser(account?.refresh_token ?? '')
-    return user
-  }),
+      const user = await getCurrentUser(account?.refresh_token ?? '')
+      return user
+    }),
 
   getCurrentUserTopTracks: publicProcedure
-  .input(z.string() || z.null())
-  .query(async ({ ctx, input }) => {
-    if(!input) return null
-    const account = await ctx.prisma.account.findFirst({
-      where: {
-        userId: input
-      }
-    });
+    .input(z.string() || z.null())
+    .query(async ({ ctx, input }) => {
+      if(!input) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input
+        }
+      });
 
-    const tracks = await getCurrentUserTopTracks(account?.refresh_token ?? '')
-    return tracks
-  }),
+      const tracks = await getCurrentUserTopTracks(account?.refresh_token ?? '')
+      return tracks
+    }),
 
   getCurrentUserTopArtists: publicProcedure
-  .input(z.string() || z.null())
-  .query(async ({ ctx, input }) => {
-    if(!input) return null
-    const account = await ctx.prisma.account.findFirst({
-      where: {
-        userId: input
-      }
-    });
+    .input(z.string() || z.null())
+    .query(async ({ ctx, input }) => {
+      if(!input) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input
+        }
+      });
 
-    const artists = await getCurrentUserTopArtists(account?.refresh_token ?? '')
-    return artists
-  })
+      const artists = await getCurrentUserTopArtists(account?.refresh_token ?? '')
+      return artists
+    })
 });
 
 async function getCurrentUser(refresh_token: string) {

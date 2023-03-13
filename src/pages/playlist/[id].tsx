@@ -6,6 +6,7 @@ import { api } from '~/utils/api'
 import { type PlaylistTrack } from '~/utils/types';
 import { FaArrowCircleUp, FaArrowCircleDown } from 'react-icons/fa'
 import { type NextPage } from 'next';
+import Head from 'next/head';
 
 const PlaylistPage: NextPage = () => {
   const router = useRouter()
@@ -24,50 +25,57 @@ const PlaylistPage: NextPage = () => {
   }, [tracks])
 
   return (
-    <div className='min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c]'>
-      <div className='py-16 px-32'>
-        {!tracks ?
-          <div className='text-white'>Loading...</div> :
-          <div className='flex flex-col gap-12 justify-center'>
-            <div className='flex flex-col gap-6'>
-              <h1 className='text-4xl text-white font-extrabold'>#1 RANKED TRACK FOR THIS PLAYLIST</h1>
-              <div className='flex flex-col gap-6 lg:flex-row'>
-                { topTrack?.track?.album?.images?.[0]?.url &&
-                  <Image 
-                    alt={topTrack?.track.name ?? 'Track'} 
-                    src={topTrack?.track.album.images[0].url} 
-                    width={400} height={400} 
-                  />
-                }
-                <div className='flex flex-col justify-between gap-6'>
-                  <div className='flex gap-3 items-center lg:flex-col lg:items-start'>
-                    <h1 className='text-white font-bold text-4xl'>{ topTrack?.track.name }</h1>
-                    { topTrack?.track.artists.map(artist => (
-                      <h1 key={artist.id} className='text-white font-semibold text-lg'>{artist.name}</h1>
-                    ))}
+    <>
+      <Head>
+        <title>Playlist</title>
+        <meta name='description' content='Find the best music for your playlists' />
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+      <div className='min-h-screen bg-gradient-to-b from-[#2e026d] to-[#15162c]'>
+        <div className='py-16 px-32'>
+          {!tracks ?
+            <div className='text-white'>Loading...</div> :
+            <div className='flex flex-col gap-12 justify-center'>
+              <div className='flex flex-col gap-6'>
+                <h1 className='text-4xl text-white font-extrabold'>#1 RANKED TRACK FOR THIS PLAYLIST</h1>
+                <div className='flex flex-col gap-6 lg:flex-row'>
+                  { topTrack?.track?.album?.images?.[0]?.url &&
+                    <Image 
+                      alt={topTrack?.track.name ?? 'Track'} 
+                      src={topTrack?.track.album.images[0].url} 
+                      width={400} height={400} 
+                    />
+                  }
+                  <div className='flex flex-col justify-between gap-6'>
+                    <div className='flex gap-3 items-center lg:flex-col lg:items-start'>
+                      <h1 className='text-white font-bold text-4xl'>{ topTrack?.track.name }</h1>
+                      { topTrack?.track.artists.map(artist => (
+                        <h1 key={artist.id} className='text-white font-semibold text-lg'>{artist.name}</h1>
+                      ))}
+                    </div>
+                    <audio src={topTrack?.track.preview_url} controls />
                   </div>
-                  <audio src={topTrack?.track.preview_url} controls />
                 </div>
               </div>
+              <div className='flex flex-col gap-3'>
+                {(!trackList || trackList.length === 0) ?
+                  <div>no tracks</div> :
+                  trackList.slice(1).map(track => (
+                    <Track 
+                      key={track.track.id} 
+                      playlistTrack={track}
+                      trackList={trackList}
+                      setTrackList={setTrackList}
+                      setTopTrack={setTopTrack}
+                    />
+                  ))
+                }
+              </div>
             </div>
-            <div className='flex flex-col gap-3'>
-              {(!trackList || trackList.length === 0) ?
-                <div>no tracks</div> :
-                trackList.slice(1).map(track => (
-                  <Track 
-                    key={track.track.id} 
-                    playlistTrack={track}
-                    trackList={trackList}
-                    setTrackList={setTrackList}
-                    setTopTrack={setTopTrack}
-                  />
-                ))
-              }
-            </div>
-          </div>
-        }
+          }
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
