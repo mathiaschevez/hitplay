@@ -3,9 +3,10 @@ import { type NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import React, { useState } from 'react'
 import { api } from '~/utils/api'
-import { type Track } from '~/utils/types'
+import { type Playlist, type Track } from '~/utils/types'
 
 const ProfilePage: NextPage = () => {
   const { data: sessionData } = useSession()
@@ -47,6 +48,11 @@ function ProfileTabs() {
       key: '2',
       label: `Your Top Artists`,
       children: <TopArtistsTab />,
+    },
+    {
+      key: '3',
+      label: `Your Playlists`,
+      children: <PlaylistsTab />,
     },
   ];
 
@@ -96,10 +102,44 @@ function TopArtistsTab() {
   const { data: sessionData } = useSession()
   const { data: topArtists } = api.user.getCurrentUserTopArtists.useQuery(sessionData?.user.id ?? '')
 
+  console.log(topArtists, 'top artists')
 
   return (
     <div>
       here
     </div>
+  )
+}
+
+function PlaylistsTab() {
+  const { data: sessionData } = useSession();
+  const { data: playlists} = api.playlist.getPlaylists.useQuery(sessionData?.user.id ?? '');
+
+  console.log(playlists, 'playlists')
+  return (
+    <div>
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
+        { playlists && 
+          playlists.map(p => (
+            <Playlist key={p.id} playlist={p} />
+          ))
+        }
+      </div>
+    </div>
+  )
+}
+
+export function Playlist({ playlist } : { playlist: Playlist }) {
+  const playlistImage = playlist.images[0]
+  
+  return (
+    <Link 
+      href={`/playlist/${playlist.id}`} 
+      className='border p-3 rounded'
+      style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
+    >
+      {playlistImage && <Image alt={playlist.name} src={playlistImage.url} width={300} height={300} />}
+      <h1 className='text-white text-lg'>{playlist.name}</h1>
+    </Link>
   )
 }

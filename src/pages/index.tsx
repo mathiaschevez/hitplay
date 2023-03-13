@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
 import Head from "next/head";
 import { type NextPage } from 'next';
 import { signIn, signOut, useSession } from 'next-auth/react';
@@ -7,14 +6,24 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import type { TabsProps } from 'antd'
 import { Tabs } from 'antd'
 import { api } from '~/utils/api';
-import { type Playlist } from '~/utils/types'
-import Link from 'next/link';
+import { type Track } from '~/utils/types';
+import Image from 'next/image';
 
 const Home: NextPage = () => {
-  const { data: sessionData } = useSession();
-  const { data: playlists} = api.playlist.getPlaylists.useQuery(sessionData?.user.id ?? '');
+  const { data: sessionData } = useSession()
+  const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '')
+  const [currentTracks, setCurrentTracks] = useState<[Track, Track] | [null, null] >()
 
-  console.log(playlists, 'herer')
+  console.log(topOneHundredTracks)
+
+  useEffect(() => {
+    //call to a function that gets two random songs from 0-99
+    topOneHundredTracks?.items[0] && topOneHundredTracks.items[1] ?
+      setCurrentTracks([topOneHundredTracks.items[0]?.track, topOneHundredTracks.items[1]?.track]) :
+      setCurrentTracks([null,  null])
+  }, [topOneHundredTracks])
+
+  console.log(currentTracks)
 
   return (
     <>
@@ -27,12 +36,17 @@ const Home: NextPage = () => {
         <div className='container flex flex-col items-center justify-center gap-12 px-4 py-1'>
           <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
           {/* <HomeTabs /> */}
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
-            { playlists && 
-              playlists.map(p => (
-                <Playlist key={p.id} playlist={p} />
-              ))
-            }
+          <div className='flex gap-12 w-full'>
+            {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map(track => (
+              <div key={track?.id} className='flex flex-col gap-6 w-1/2'>
+                <TrackCard track={track} />
+                <button
+                  onClick={() => console.log(track.id)}
+                  // style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
+                  className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'
+                >Vote</button>
+              </div>
+            ))}
           </div>
           <AuthShowcase />
         </div>
@@ -42,6 +56,18 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+function TrackCard({ track } : { track: Track }) {
+  return (
+    <div className='flex flex-col gap-3 p-6 items-center border-2 rounded'>
+      { track.album.images?.[0]?.url && 
+        <Image alt={track.name} src={track.album.images[0].url} width={350} height={350} />
+      }
+      <h1 className='text-white text-left w-full text-lg font-bold'>{track.name}</h1>
+      <audio className='w-full' src={track.preview_url} controls />
+    </div>
+  )
+}
 
 export function HomeTabs() {
   const [activeTab, setActiveTab] = useState('1')
@@ -82,22 +108,6 @@ export function Tracks() {
     track ? 
       <div>{track.name}</div> :
       <div>Track not found</div>
-  )
-}
-
-
-export function Playlist({ playlist } : { playlist: Playlist }) {
-  const playlistImage = playlist.images[0]
-  
-  return (
-    <Link 
-      href={`/playlist/${playlist.id}`} 
-      className='border p-3 rounded'
-      style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
-    >
-      {playlistImage && <Image alt={playlist.name} src={playlistImage.url} width={300} height={300} />}
-      <h1 className='text-white text-lg'>{playlist.name}</h1>
-    </Link>
   )
 }
 
