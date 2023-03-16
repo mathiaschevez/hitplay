@@ -6,21 +6,33 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import type { TabsProps } from 'antd'
 import { Tabs } from 'antd'
 import { api } from '~/utils/api';
-import { type Track } from '~/utils/types';
+import { type PlaylistTrack, type Track } from '~/utils/types';
 import Image from 'next/image';
+
+interface PlaylistTracksData {
+  items: PlaylistTrack[]
+}
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession()
   const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '')
-  const [currentTracks, setCurrentTracks] = useState<[Track, Track] | [null, null] >()
-
-  console.log(topOneHundredTracks)
+  const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
 
   useEffect(() => {
-    //call to a function that gets two random songs from 0-99
-    topOneHundredTracks?.items[0] && topOneHundredTracks.items[1] ?
-      setCurrentTracks([topOneHundredTracks.items[0]?.track, topOneHundredTracks.items[1]?.track]) :
-      setCurrentTracks([null,  null])
+    function getTwoRandomTracks(trackList: PlaylistTracksData) {
+      const first = Math.floor(Math.random() * trackList.items.length);
+      let second = Math.floor(Math.random() * trackList.items.length);
+      while (first === second) {
+        second = Math.floor(Math.random() * trackList.items.length);
+      }
+
+      setCurrentTracks([
+        trackList.items[first]?.track ?? null,
+        trackList.items[second]?.track ?? null
+      ])
+    }
+    
+    topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks) 
   }, [topOneHundredTracks])
 
   return (
@@ -37,10 +49,9 @@ const Home: NextPage = () => {
           <div className='flex flex-wrap gap-20 items-center justify-center'>
             {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map(track => (
               <div key={track?.id} className='flex flex-col gap-6'>
-                <TrackCard track={track} />
+                { track && <TrackCard track={track} />}
                 <button
-                  onClick={() => console.log(track.id)}
-                  // style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
+                  onClick={() => console.log(track?.id)}
                   className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'
                 >Vote</button>
               </div>
