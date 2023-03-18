@@ -3,6 +3,7 @@ import { exampleRouter } from '~/server/api/routers/example';
 import { playlistRouter } from '~/server/api/routers/playlist'
 import { trackRouter } from './routers/track';
 import { userRouter } from './routers/user';
+import { duelRouter } from './routers/duel';
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   playlist: playlistRouter,
   track: trackRouter,
   user: userRouter,
+  duel: duelRouter,
 });
 
 // export type definition of API

@@ -55,7 +55,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  duels         Duel[]
+  seenDuels     Duel[]    @relation("SeenBy")
 }
 
 model VerificationToken {
@@ -67,31 +67,28 @@ model VerificationToken {
 }
 
 model Duel {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-
-  track1   Track   @relation("track1", fields: [track1Id], references: [id])
-  track1Id String
-  track2   Track   @relation("track2", fields: [track2Id], references: [id])
-  track2Id String
-  winner   Track?  @relation("winner", fields: [winnerId], references: [id])
-  winnerId String?
-  loser    Track?  @relation("loser", fields: [loserId], references: [id])
-  loserId  String?
-  userId   String
-  user     User    @relation(fields: [userId], references: [id])
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  userId     String
+  track1     Track    @relation("track1", fields: [track1Id], references: [id])
+  track1Id   String
+  track2     Track    @relation("track2", fields: [track2Id], references: [id])
+  track2Id   String
+  winner     Track?   @relation("winner", fields: [winnerId], references: [id])
+  winnerId   String?
+  loser      Track?   @relation("loser", fields: [loserId], references: [id])
+  loserId    String?
+  seenByUser User[]   @relation("SeenBy")
 }
 
 model Track {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
   name       String
   imageUrl   String
   previewURL String
-
-  winnerOf Duel[] @relation("winner")
-  loserOf  Duel[] @relation("loser")
-  duels    Duel[] @relation("track1")
-  duels2   Duel[] @relation("track2")
+  winnerOf   Duel[]   @relation("winner")
+  loserOf    Duel[]   @relation("loser")
+  duels      Duel[]   @relation("track1")
+  duels2     Duel[]   @relation("track2")
 }

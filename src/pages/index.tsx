@@ -17,7 +17,8 @@ const Home: NextPage = () => {
   const { data: sessionData } = useSession()
   const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '')
   const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
-  // const createMutation = api.track.addTrackToDb.useMutation()
+  const trackCreation = api.track.createTrack.useMutation()
+  const duelCreation = api.duel.createDuel.useMutation()
 
   useEffect(() => {
     function getTwoRandomTracks(trackList: PlaylistTracksData) {
@@ -39,14 +40,46 @@ const Home: NextPage = () => {
   const handleCreate = () => {
     topOneHundredTracks?.items?.forEach((t, i) => {
       console.log(t.track?.name, i)
-      // const track = t.track
-      // createMutation.mutate({
-      //   id: track.id,
-      //   name: track.name,
-      //   imageUrl: track.album?.images?.[0]?.url || '',
-      //   previewURL: track.preview_url || '',
-      // })
+      trackCreation.mutate({
+        id: t.track?.id,
+        name: t.track?.name,
+        imageUrl: t.track?.album?.images?.[0]?.url || '',
+        previewURL: t.track?.preview_url || '',
+      })
     })
+  }
+
+  const handleVote = async (winnerIndex: number) => {
+    const winner = currentTracks?.[winnerIndex]
+    const loser = currentTracks?.[winnerIndex === 0 ? 1 : 0]
+
+    //create a track for both winner and loset
+    await trackCreation.mutateAsync({
+      id: winner?.id ?? '',
+      name: winner?.name ?? '',
+      imageUrl: winner?.album?.images?.[0]?.url || '',
+      previewURL: winner?.preview_url || '',
+    })
+
+    await trackCreation.mutateAsync({
+      id: loser?.id ?? '',
+      name: loser?.name ?? '',
+      imageUrl: loser?.album?.images?.[0]?.url || '',
+      previewURL: loser?.preview_url || '',
+    })
+
+    const createdDuel = await duelCreation.mutateAsync({
+      track1Id: currentTracks?.[0]?.id ?? '',
+      track2Id: currentTracks?.[1]?.id ?? '',
+      userId: sessionData?.user.id ?? '',
+      winnerId: winner?.id ?? '',
+      loserId: loser?.id ?? '',
+    })
+
+    console.log(createdDuel, 'createdDuel')
+
+    // update the track with duel id
+    //assign the duel to a user
   }
 
   return (
@@ -61,11 +94,11 @@ const Home: NextPage = () => {
           <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
           {/* <HomeTabs /> */}
           <div className='flex flex-wrap gap-20 items-center justify-center'>
-            {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map(track => (
+            {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
               <div key={track?.id} className='flex flex-col gap-6'>
                 { track && <TrackCard track={track} />}
                 <button
-                  onClick={() => console.log(track?.id)}
+                  onClick={() => void handleVote(i)}
                   className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'
                 >Vote</button>
               </div>

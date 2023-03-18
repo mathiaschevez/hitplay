@@ -58,16 +58,22 @@ export const trackRouter = createTRPCRouter({
       return tracks.tracks ?? []
     }),
 
-  addTrackToDb: publicProcedure
-    .input(z.object({ id: z.string(), name: z.string(), imageUrl: z.string(), previewURL: z.string() }))
+  createTrack: publicProcedure
+    .input(z.object({ 
+      id: z.string(), 
+      name: z.string(), 
+      imageUrl: z.string(), 
+      previewURL: z.string() 
+    }))
     .mutation(async ({ ctx, input }) => {
-      const creation = await ctx.prisma.track.create({
+      const track = await ctx.prisma.track.create({
         data: {
           ...input
         }
       })
 
-      console.log(creation, 'CREATION')
+      console.log(track, 'CREATION')
+      return track
     })
 
 });
