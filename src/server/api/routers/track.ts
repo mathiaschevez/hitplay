@@ -58,15 +58,18 @@ export const trackRouter = createTRPCRouter({
       return tracks.tracks ?? []
     }),
 
-  // getById: publicProcedure
-  //   .input(z.string())
-  //   .query(({ ctx, input }) => {
-  //     return ctx.prisma.user.findFirst({
-  //       where: {
-  //         id: input,
-  //       },
-  //     });
-  //   }),
+  addTrackToDb: publicProcedure
+    .input(z.object({ id: z.string(), name: z.string(), imageUrl: z.string(), previewURL: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const creation = await ctx.prisma.track.create({
+        data: {
+          ...input
+        }
+      })
+
+      console.log(creation, 'CREATION')
+    })
+
 });
 
 async function getTracksByPlaylist(refresh_token: string, playlistId: string) {

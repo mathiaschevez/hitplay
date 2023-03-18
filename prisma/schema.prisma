@@ -55,6 +55,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  duels         Duel[]
 }
 
 model VerificationToken {
@@ -65,14 +66,20 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Vote {
+model Duel {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 
-  votedFor       Track  @relation(name: "votesFor", fields: [votedForId], references: [id])
-  votedForId     String
-  votedAgainst   Track  @relation(name: "votesAgainst", fields: [votedAgainstId], references: [id])
-  votedAgainstId String
+  track1   Track   @relation("track1", fields: [track1Id], references: [id])
+  track1Id String
+  track2   Track   @relation("track2", fields: [track2Id], references: [id])
+  track2Id String
+  winner   Track?  @relation("winner", fields: [winnerId], references: [id])
+  winnerId String?
+  loser    Track?  @relation("loser", fields: [loserId], references: [id])
+  loserId  String?
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
 }
 
 model Track {
@@ -83,12 +90,8 @@ model Track {
   imageUrl   String
   previewURL String
 
-  VoteFor     Vote[]  @relation("votesFor")
-  VoteAgainst Vote[]  @relation("votesAgainst")
-  playlistId  String?
-}
-
-model Playlist {
-  id   String @id @default(cuid())
-  name String
+  winnerOf Duel[] @relation("winner")
+  loserOf  Duel[] @relation("loser")
+  duels    Duel[] @relation("track1")
+  duels2   Duel[] @relation("track2")
 }

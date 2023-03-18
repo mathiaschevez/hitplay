@@ -17,6 +17,7 @@ const Home: NextPage = () => {
   const { data: sessionData } = useSession()
   const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '')
   const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
+  const createMutation = api.track.addTrackToDb.useMutation()
 
   useEffect(() => {
     function getTwoRandomTracks(trackList: PlaylistTracksData) {
@@ -34,6 +35,26 @@ const Home: NextPage = () => {
     
     topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks) 
   }, [topOneHundredTracks])
+
+  const handleCreate = () => {
+    if(!topOneHundredTracks?.items) return
+
+    for(let i = 0; i < topOneHundredTracks?.items?.length; i++) {
+      console.log(topOneHundredTracks?.items[i]?.track?.preview_url, i)
+      if(topOneHundredTracks?.items[i]?.track?.id === undefined) return
+      const track = topOneHundredTracks.items[i]?.track
+      if(!track || !track.album.images?.[0]) return 
+
+      // createMutation.mutate({
+      //   id: track.id,
+      //   name: track.name,
+      //   imageUrl: track.album?.images?.[0]?.url,
+      //   previewURL: track.preview_url,
+      // })
+    }
+  }
+
+  console.log(topOneHundredTracks)
 
   return (
     <>
@@ -57,6 +78,7 @@ const Home: NextPage = () => {
               </div>
             ))}
           </div>
+          <button onClick={() => handleCreate()}>CREATE</button>
           <AuthShowcase />
         </div>
       </main>
