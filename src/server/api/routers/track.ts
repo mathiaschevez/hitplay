@@ -66,15 +66,31 @@ export const trackRouter = createTRPCRouter({
       previewURL: z.string() 
     }))
     .mutation(async ({ ctx, input }) => {
+      const trackInDb = await ctx.prisma.track.findFirst({
+        where: {
+          id: input.id
+        }
+      })
+
+      if(trackInDb) {
+        console.log(trackInDb, 'TRACK FOUND IN DB')
+        return trackInDb
+      }
+
       const track = await ctx.prisma.track.create({
         data: {
           ...input
         }
       })
 
-      console.log(track, 'CREATION')
+      console.log(track, 'CREATED NEW TRACK')
       return track
-    })
+    }),
+
+    getTracksFromDb: publicProcedure
+      .query(({ ctx }) => {
+        return ctx.prisma.track.findMany()
+      })
 
 });
 

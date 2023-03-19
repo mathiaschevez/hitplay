@@ -1,10 +1,5 @@
 import { z } from 'zod';
-
-import {
-  createTRPCRouter,
-  publicProcedure,
-  // protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const duelRouter = createTRPCRouter({
   createDuel: publicProcedure
@@ -16,7 +11,38 @@ export const duelRouter = createTRPCRouter({
       loserId: z.string(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const duel = await ctx.prisma.duel.create({
+      const duelInDb = await ctx.prisma.duel.findFirst({
+        where: {
+          track1Id: input.track1Id,
+          track2Id: input.track2Id,
+        }
+      })
+
+      if(duelInDb) {
+        const duelWithUser = await ctx.prisma.duel.findFirst({
+          where: {
+            seenByUser: {
+              some: {
+                id: input.userId
+              }
+            }
+          }
+        })
+
+        if(duelWithUser) return duelWithUser
+
+        const updatedDuelWithUser = await ctx.prisma.duel.update({
+          where: { id: duelInDb.id },
+          data: {
+            seenByUser: {
+              connect: { id: input.userId }
+            }
+          }
+        })
+        return updatedDuelWithUser
+      }
+
+      const newDuel = await ctx.prisma.duel.create({
         data: {
           track1Id: input.track1Id,
           track2Id: input.track2Id,
@@ -26,28 +52,31 @@ export const duelRouter = createTRPCRouter({
         }
       })
 
-      // const updatedDuel = await ctx.prisma.duel.update({
-      //   where: { id: duel.id },
-      //   data: { winnerId: input.track1Id, loserId: input.track2Id }
-      // })
+      const updatedDuelWithUser = await ctx.prisma.duel.update({
+        where: { id: newDuel.id },
+        data: {
+          seenByUser: {
+            connect: { id: input.userId }
+          }
+        }
+      })
 
-      console.log(duel, 'DUEL CREATED')
-      return duel;
-    })
+      console.log(updatedDuelWithUser, 'DUEL UPDATED WITH USER')
+      return updatedDuelWithUser;
+    }),
 
-  // updateDuelWithWinnerAndLoser: publicProcedure
-  //   .input(z.object({
-  //     duelId: z.string(),
-  //     winnerId: z.string(),
-  //     loserId: z.string(),
-  //   }))
-  //   .mutation(async ({ ctx, input }) => {
-  //     const updatedDuel = await ctx.prisma.duel.update({
-  //       where: { id: input.duelId },
-  //       data: { winnerId: input.winnerId, loserId: input.loserId }
-  //     })
+    checkForDuplicateDuel: publicProcedure
+      .input(z.object({ track1Id: z.string(), track2Id: z.string() }))
+      .query(async ({ ctx, input }) => {
+        if(!input) return false
+        const duelInDb = await ctx.prisma.duel.findFirst({
+          where: {
+            track1Id: input.track1Id,
+            track2Id: input.track2Id,
+          }
+        })
 
-  //     console.log(updatedDuel, 'DUEL UPDATED')
-  //     return updatedDuel;
-  //   })
+        return duelInDb ?
+          true : false
+      }),
 });
