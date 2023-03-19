@@ -11,8 +11,18 @@ interface PlaylistTracksData {
   items: PlaylistTrack[]
 }
 
+interface TrackFromDb {
+  id: string,
+  createdAt: Date,
+  name: string,
+  imageUrl: string,
+  previewURL: string,
+  winRate?: number,
+}
+
 const Home: NextPage = () => {
   const { data: sessionData } = useSession()
+  const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
   const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '')
   const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
   const trackCreation = api.track.createTrack.useMutation()
@@ -25,6 +35,7 @@ const Home: NextPage = () => {
   function getTwoRandomTracks(trackList: PlaylistTracksData) {
     const first = Math.floor(Math.random() * trackList.items.length);
     let second = Math.floor(Math.random() * trackList.items.length);
+
     while (first === second) {
       second = Math.floor(Math.random() * trackList.items.length);
     }
@@ -64,6 +75,7 @@ const Home: NextPage = () => {
     })
 
     topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks)
+    await refetchTracksFromDb()
   }
 
   return (
@@ -84,7 +96,7 @@ const Home: NextPage = () => {
               </div>
             ))}
           </div>
-          <TrackStandings />
+          { tracksInDb && <TrackStandings tracks={tracksInDb} /> }
         </div>
         <AuthShowcase />
       </main>
@@ -94,15 +106,26 @@ const Home: NextPage = () => {
 
 export default Home;
 
-const TrackStandings = () => {
-  const { data: tracksInDb } = api.track.getTracksFromDb.useQuery()
+const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
+  const { data: tracksWithWinRates } = api.track.getTrackWinRates.useQuery(tracks)
+  const sortedTracks = tracksWithWinRates?.sort((a, b) => (b.winRate ?? 0) - (a.winRate ?? 0))
+
   return (
-    <div className='border rounded p-6'>
+    <div className='border rounded p-6 w-[33%]'>
       <h1 className='font-bold text-3xl text-[hsl(280,100%,70%)] mb-3'>TRACK STANDINGS</h1>
-      {tracksInDb?.map((track, i) => (
+      {sortedTracks?.slice(0, 20).map((track, i) => (
         <div key={track.id} className='text-white flex gap-3'>
-          <span className='text-[hsl(280,100%,70%)] text-lg font-bold'>{i + 1}.</span>
-          {track.name}
+          <div className='flex justify-between w-full'>
+            <div>
+              <span>{i + 1}. </span>
+              <span className='font-semibold text-lg'>{track.name}</span>
+            </div>
+            {track.winRate && 
+              <span className='text-[hsl(280,100%,70%)] font-bold'>
+                {track.winRate < 1 ? (track.winRate * 100).toFixed() : track.winRate}%
+              </span>
+            }
+          </div>
         </div>
       ))}
     </div>

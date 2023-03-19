@@ -15,6 +15,16 @@ interface PlaylistByIdData {
   tracks: PlaylistTracksData
 }
 
+interface TrackFromDb {
+  id: string,
+  createdAt: Date,
+  name: string,
+  imageUrl: string,
+  previewURL: string,
+  winRate?: number,
+  lossRate?: number,
+}
+
 export const trackRouter = createTRPCRouter({
   getTrack: publicProcedure
     .input(z.string() || z.null())
@@ -90,6 +100,44 @@ export const trackRouter = createTRPCRouter({
     getTracksFromDb: publicProcedure
       .query(({ ctx }) => {
         return ctx.prisma.track.findMany()
+      }),
+
+    getTrackWinRates: publicProcedure
+      .input(z.array(
+        z.object({ 
+          id: z.string(),
+          createdAt: z.date(),
+          name: z.string(),
+          imageUrl: z.string(),
+          previewURL: z.string(),
+        })
+      ))
+      .query(async ({ ctx, input }) => {
+        const newList: TrackFromDb[] = []
+
+        for(const track of input) {
+          const duelWins = await ctx.prisma.duel.findMany({
+            where: {
+              winnerId: track.id
+            }
+          })
+
+          const duelLosses = await ctx.prisma.duel.findMany({
+            where: {
+              loserId: track.id
+            }
+          })
+
+          newList.push({
+            ...track,
+            winRate: 
+              duelWins.length === 0 ? 0 :
+              duelLosses.length === 0 ? 100 : 
+              duelWins.length / (duelWins.length + duelLosses.length)
+          })
+        }
+
+        return newList
       })
 
 });
