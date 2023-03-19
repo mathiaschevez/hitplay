@@ -7,7 +7,6 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { ConfigProvider, theme } from "antd";
 import { Layout } from "~/components/Layout";
-import { StateContext } from "~/context/Context";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -15,13 +14,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <StateContext>
-        <ConfigProvider theme={themeConfig}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ConfigProvider>
-      </StateContext>
+      <ConfigProvider theme={themeConfig}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </ConfigProvider>
     </SessionProvider>
   )
 };
