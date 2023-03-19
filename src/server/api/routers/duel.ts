@@ -64,19 +64,4 @@ export const duelRouter = createTRPCRouter({
       console.log(updatedDuelWithUser, 'DUEL UPDATED WITH USER')
       return updatedDuelWithUser;
     }),
-
-    checkForDuplicateDuel: publicProcedure
-      .input(z.object({ track1Id: z.string(), track2Id: z.string() }))
-      .query(async ({ ctx, input }) => {
-        if(!input) return false
-        const duelInDb = await ctx.prisma.duel.findFirst({
-          where: {
-            track1Id: input.track1Id,
-            track2Id: input.track2Id,
-          }
-        })
-
-        return duelInDb ?
-          true : false
-      }),
 });

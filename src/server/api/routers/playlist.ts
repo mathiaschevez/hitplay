@@ -11,7 +11,7 @@ interface PlaylistsData {
 }
 
 export const playlistRouter = createTRPCRouter({
-  getPlaylists: publicProcedure
+  getUserPlaylists: publicProcedure
     .input(z.string() || z.null())
     .query(async ({ ctx, input }) => {
       if(!input) return null

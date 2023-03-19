@@ -8,10 +8,7 @@ import "~/styles/globals.css";
 import { ConfigProvider, theme } from "antd";
 import { Layout } from "~/components/Layout";
 
-const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}) => {
+const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
     <SessionProvider session={session}>
       <ConfigProvider theme={themeConfig}>

@@ -38,27 +38,21 @@ function ProfileTabs() {
   const [activeTab, setActiveTab] = useState('1')
 
   const tabItems: TabsProps['items'] = [
-    {
-      key: '1',
+    { key: '1',
       label: `Your Top Tracks`,
-      children: <TopTracksTab />,
-    },
-    {
-      key: '2',
+      children: <TopTracksTab /> },
+    { key: '2',
       label: `Your Top Artists`,
-      children: <TopArtistsTab />,
-    },
-    {
-      key: '3',
+      children: <TopArtistsTab /> },
+    { key: '3',
       label: `Your Playlists`,
-      children: <PlaylistsTab />,
-    },
+      children: <PlaylistsTab /> }
   ];
 
   return (
     <Tabs 
-      centered
-      className='w-full h-full'
+      centered 
+      className='w-full h-full' 
       activeKey={activeTab} 
       items={tabItems} 
       onChange={(e) => setActiveTab(e)} 
@@ -81,17 +75,12 @@ function TopTracksTab() {
 
 function TopTrack({ track, rank } : { track: Track, rank: number }) {
   return (
-    <div 
-      style={{ backgroundColor: 'rgba(171, 119, 248, .25)' }} 
-      className='border-2 flex p-3 rounded gap-3'
-    >
+    <div style={{ backgroundColor: 'rgba(171, 119, 248, .25)' }} className='border-2 flex p-3 rounded gap-3'>
       <h1 className='font-bold'>{rank}.</h1>
       <div className='flex flex-col'>
         { track.album.images[0]?.url && <Image alt={track.name} src={track.album.images[0].url} width={200} height={200} /> }
         <h1 className='font-bold'>{track.name}</h1>
-        {track.artists.map(artist => (
-          <h1 key={artist.id}>{artist.name}</h1>
-        ))}
+        {track.artists.map(artist => <h1 key={artist.id}>{ artist.name }</h1> )}
       </div>
     </div>
   )
@@ -114,17 +103,13 @@ function TopArtistsTab() {
 
 function PlaylistsTab() {
   const { data: sessionData } = useSession();
-  const { data: playlists} = api.playlist.getPlaylists.useQuery(sessionData?.user.id ?? '');
+  const { data: playlists} = api.playlist.getUserPlaylists.useQuery(sessionData?.user.id ?? '');
 
   return (
-    <div>
-      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
-        { playlists && 
-          playlists.map(p => (
-            <Playlist key={p.id} playlist={p} />
-          ))
-        }
-      </div>
+    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
+      {playlists && playlists.map(p => (
+        <Playlist key={p.id} playlist={p} />
+      ))}
     </div>
   )
 }
@@ -139,7 +124,7 @@ export function Playlist({ playlist } : { playlist: Playlist }) {
       style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
     >
       {playlistImage && <Image alt={playlist.name} src={playlistImage.url} width={300} height={300} />}
-      <h1 className='text-white text-lg'>{playlist.name}</h1>
+      <h1 className='text-white text-lg mt-3'>{playlist.name}</h1>
     </Link>
   )
 }

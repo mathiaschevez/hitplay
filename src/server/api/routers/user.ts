@@ -65,6 +65,7 @@ export const userRouter = createTRPCRouter({
     })
 });
 
+// SPOTIFY API CALLS
 async function getCurrentUser(refresh_token: string) {
   const { access_token } = await getAccessToken(refresh_token)
 

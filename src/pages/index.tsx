@@ -17,17 +17,22 @@ interface TrackFromDb {
   name: string,
   imageUrl: string,
   previewURL: string,
-  winRate?: number,
+  winnerOf: { id: string }[]
+  loserOf: { id: string }[]
 }
 
 const Home: NextPage = () => {
-  const { data: sessionData } = useSession()
-  const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
-  const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '')
-  const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
   const trackCreation = api.track.createTrack.useMutation()
   const duelCreation = api.duel.createDuel.useMutation()
+  const { data: sessionData } = useSession()
+  const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
+  const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '', {
+    staleTime: 1000 * 60 * 60 * 24,
+    cacheTime: 1000 * 60 * 60 * 24,
+  })
 
+  const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
+ 
   useEffect(() => {
     topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks) 
   }, [topOneHundredTracks])
@@ -92,7 +97,9 @@ const Home: NextPage = () => {
             {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
               <div key={track?.id} className='flex flex-col gap-6'>
                 { track && <TrackCard track={track} />}
-                <button onClick={() => void handleVote(i)} className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'>Vote</button>
+                <button onClick={() => void handleVote(i)} className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'>
+                  Vote
+                </button>
               </div>
             ))}
           </div>
@@ -107,24 +114,26 @@ const Home: NextPage = () => {
 export default Home;
 
 const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
-  const { data: tracksWithWinRates } = api.track.getTrackWinRates.useQuery(tracks)
-  const sortedTracks = tracksWithWinRates?.sort((a, b) => (b.winRate ?? 0) - (a.winRate ?? 0))
+  
+  const getTrackWinRate = (track: TrackFromDb) => {
+    const totalDuels = track.winnerOf.length + track.loserOf.length
+    const winRate = track.winnerOf.length / totalDuels
+    return winRate * 100
+  }
 
   return (
     <div className='border rounded p-6 w-[33%]'>
       <h1 className='font-bold text-3xl text-[hsl(280,100%,70%)] mb-3'>TRACK STANDINGS</h1>
-      {sortedTracks?.slice(0, 20).map((track, i) => (
+      {tracks?.slice(0, 20).map((track, i) => (
         <div key={track.id} className='text-white flex gap-3'>
           <div className='flex justify-between w-full'>
             <div>
               <span>{i + 1}. </span>
               <span className='font-semibold text-lg'>{track.name}</span>
             </div>
-            {track.winRate && 
-              <span className='text-[hsl(280,100%,70%)] font-bold'>
-                {track.winRate < 1 ? (track.winRate * 100).toFixed() : track.winRate}%
-              </span>
-            }
+            <span className='text-[hsl(280,100%,70%)] font-bold'>
+              {getTrackWinRate(track)}%
+            </span>
           </div>
         </div>
       ))}
