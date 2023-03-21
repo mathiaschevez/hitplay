@@ -22,6 +22,9 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
 
 const themeConfig = {
   algorithm: theme.darkAlgorithm,
+  token: {
+    colorPrimary: '#AB77F8',
+  },
 }
 
 export default api.withTRPC(MyApp);

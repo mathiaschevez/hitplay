@@ -39,6 +39,7 @@ export const duelRouter = createTRPCRouter({
             }
           }
         })
+
         return updatedDuelWithUser
       }
 

@@ -93,7 +93,7 @@ const Home: NextPage = () => {
       <main className='flex flex-col items-center justify-center gap-12 px-4 py-1 w-full'>
         <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
         <div className='flex gap-3 justify-around w-full'>
-          <div className='flex flex-wrap gap-20 items-center justify-center'>
+          <div className='flex flex-wrap gap-10 items-center justify-center'>
             {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
               <div key={track?.id} className='flex flex-col gap-6'>
                 { track && <TrackCard track={track} />}
@@ -114,17 +114,23 @@ const Home: NextPage = () => {
 export default Home;
 
 const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
-  
-  const getTrackWinRate = (track: TrackFromDb) => {
+
+  const trackWithWinRate = tracks.map(track => {
     const totalDuels = track.winnerOf.length + track.loserOf.length
     const winRate = track.winnerOf.length / totalDuels
-    return winRate * 100
-  }
+
+    return {
+      ...track,
+      winRate: winRate * 100
+    }
+  })
+
+  const sortedTracks = trackWithWinRate.sort((a, b) => b.winRate - a.winRate)
 
   return (
     <div className='border rounded p-6 w-[33%]'>
       <h1 className='font-bold text-3xl text-[hsl(280,100%,70%)] mb-3'>TRACK STANDINGS</h1>
-      {tracks?.slice(0, 20).map((track, i) => (
+      {sortedTracks?.slice(0, 20).map((track, i) => (
         <div key={track.id} className='text-white flex gap-3'>
           <div className='flex justify-between w-full'>
             <div>
@@ -132,7 +138,7 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
               <span className='font-semibold text-lg'>{track.name}</span>
             </div>
             <span className='text-[hsl(280,100%,70%)] font-bold'>
-              {getTrackWinRate(track)}%
+              {track.winRate}%
             </span>
           </div>
         </div>
@@ -145,10 +151,13 @@ const TrackCard = ({ track } : { track: Track }) => {
   return (
     <div className='flex flex-col gap-3 p-6 items-center border-2 rounded'>
       { track.album.images?.[0]?.url && 
-        <Image alt={track.name} src={track.album.images[0].url} width={350} height={350} />
+        <Image alt={track.name} src={track.album.images[0].url} width={300} height={300} />
       }
       <h1 className='text-white text-left w-full text-lg font-bold'>{track.name}</h1>
-      <audio className='w-full' src={track.preview_url} controls />
+      { track.preview_url ?
+        <audio className='w-full' src={track.preview_url} controls /> :
+        <h1 className='text-white h-full'>This song is missing a preview :&#40;</h1>
+      }
     </div>
   )
 }

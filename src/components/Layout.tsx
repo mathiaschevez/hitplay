@@ -1,11 +1,12 @@
 import { Avatar } from 'antd'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 export function Layout({ children } : { children: JSX.Element }) {
   return (
-    <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#2e026d] to-[#15162c]'>
+    <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#2e026d] to-[#15162c] pb-8'>
       <Navbar />
       {children}
     </div>
@@ -16,8 +17,10 @@ function Navbar() {
   const { data: sessionData } = useSession()
 
   return(
-    <div className='flex items-center w-full justify-between gap-12 px-8 py-3'>
-      <Link href='/' className='text-white'>Home</Link>
+    <div className='flex items-center w-full justify-between gap-12 px-8 pt-6 pb-3'>
+      <Link href='/' className='text-white'>
+        <Image alt='Home' src='/hitplaylogo.png' width={45} height={45} />
+      </Link>
       <Link href='/profile' className='text-white'>
         <Avatar src={sessionData?.user.image}/>
       </Link>

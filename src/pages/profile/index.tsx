@@ -76,11 +76,12 @@ function TopTracksTab() {
 function TopTrack({ track, rank } : { track: Track, rank: number }) {
   return (
     <div style={{ backgroundColor: 'rgba(171, 119, 248, .25)' }} className='border-2 flex p-3 rounded gap-3'>
-      <h1 className='font-bold'>{rank}.</h1>
-      <div className='flex flex-col'>
+      <div className='flex flex-col gap-3 w-full items-center justify-center'>
         { track.album.images[0]?.url && <Image alt={track.name} src={track.album.images[0].url} width={200} height={200} /> }
-        <h1 className='font-bold'>{track.name}</h1>
-        {track.artists.map(artist => <h1 key={artist.id}>{ artist.name }</h1> )}
+        <div className='flex gap-1'>
+          <span className='font-bold text-lg'>{rank}.</span>
+          <h1 className='font-bold text-lg'>{track.name}</h1>
+        </div>
       </div>
     </div>
   )
@@ -91,10 +92,16 @@ function TopArtistsTab() {
   const { data: topArtists } = api.user.getCurrentUserTopArtists.useQuery(sessionData?.user.id ?? '')
 
   return (
-    <div>
-      {topArtists?.items.map(artist => (
-        <div key={artist.id}>
-          <h1>{artist.name}</h1>
+    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-6'>
+      {topArtists?.items.map((artist, i) => (
+        <div style={{ backgroundColor: 'rgba(171, 119, 248, .25)' }} className='border rounded p-3 flex flex-col items-center h-full justify-center gap-3' key={artist.id}>
+          <div className='flex gap-1'>
+            <span className='font-bold text-lg'>{i + 1}.</span>
+            <h1 className='font-bold text-lg'>{artist.name}</h1>
+          </div>
+          {artist.images[0]?.url && 
+            <Image alt={artist.name} src={artist.images[0].url} width={200} height={200} />
+          }
         </div>
       ))}
     </div>
@@ -106,7 +113,7 @@ function PlaylistsTab() {
   const { data: playlists} = api.playlist.getUserPlaylists.useQuery(sessionData?.user.id ?? '');
 
   return (
-    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
+    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-6'>
       {playlists && playlists.map(p => (
         <Playlist key={p.id} playlist={p} />
       ))}
