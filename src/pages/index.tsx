@@ -115,7 +115,7 @@ export default Home;
 
 const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
 
-  const trackWithWinRate = tracks.map(track => {
+  const tracksWithWinRate = tracks.map(track => {
     const totalDuels = track.winnerOf.length + track.loserOf.length
     const winRate = track.winnerOf.length / totalDuels
 
@@ -125,7 +125,7 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
     }
   })
 
-  const sortedTracks = trackWithWinRate.sort((a, b) => b.winRate - a.winRate)
+  const sortedTracks = tracksWithWinRate.sort((a, b) => b.winRate - a.winRate)
 
   return (
     <div className='border rounded p-6 w-[33%]'>
@@ -138,7 +138,7 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
               <span className='font-semibold text-lg'>{track.name}</span>
             </div>
             <span className='text-[hsl(280,100%,70%)] font-bold'>
-              {track.winRate}%
+              {track.winRate.toFixed()}%
             </span>
           </div>
         </div>
