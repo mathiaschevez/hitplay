@@ -22,66 +22,66 @@ interface TrackFromDb {
 }
 
 const Home: NextPage = () => {
-  const trackCreation = api.track.createTrack.useMutation()
-  const duelCreation = api.duel.createDuel.useMutation()
-  const { data: sessionData } = useSession()
-  const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
-  const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '', {
-    staleTime: 1000 * 60 * 60 * 24,
-    cacheTime: 1000 * 60 * 60 * 24,
-  })
+  // const trackCreation = api.track.createTrack.useMutation()
+  // const duelCreation = api.duel.createDuel.useMutation()
+  // const { data: sessionData } = useSession()
+  // const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
+  // const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '', {
+  //   staleTime: 1000 * 60 * 60 * 24,
+  //   cacheTime: 1000 * 60 * 60 * 24,
+  // })
 
-  const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
+  // const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
  
-  useEffect(() => {
-    topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks) 
-  }, [topOneHundredTracks])
+  // useEffect(() => {
+  //   topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks) 
+  // }, [topOneHundredTracks])
 
-  function getTwoRandomTracks(trackList: PlaylistTracksData) {
-    const first = Math.floor(Math.random() * trackList.items.length);
-    let second = Math.floor(Math.random() * trackList.items.length);
+  // function getTwoRandomTracks(trackList: PlaylistTracksData) {
+  //   const first = Math.floor(Math.random() * trackList.items.length);
+  //   let second = Math.floor(Math.random() * trackList.items.length);
 
-    while (first === second) {
-      second = Math.floor(Math.random() * trackList.items.length);
-    }
+  //   while (first === second) {
+  //     second = Math.floor(Math.random() * trackList.items.length);
+  //   }
 
-    setCurrentTracks([
-      trackList.items[first]?.track ?? null,
-      trackList.items[second]?.track ?? null
-    ])
-  }
+  //   setCurrentTracks([
+  //     trackList.items[first]?.track ?? null,
+  //     trackList.items[second]?.track ?? null
+  //   ])
+  // }
 
-  const handleVote = async (winnerIndex: number) => {
-    const winner = currentTracks?.[winnerIndex]
-    const loser = currentTracks?.[winnerIndex === 0 ? 1 : 0]
+  // const handleVote = async (winnerIndex: number) => {
+  //   const winner = currentTracks?.[winnerIndex]
+  //   const loser = currentTracks?.[winnerIndex === 0 ? 1 : 0]
 
-    //create a track for both winner and loser
-    await trackCreation.mutateAsync({
-      id: winner?.id ?? '',
-      name: winner?.name ?? '',
-      imageUrl: winner?.album?.images?.[0]?.url || '',
-      previewURL: winner?.preview_url || '',
-    })
+  //   //create a track for both winner and loser
+  //   await trackCreation.mutateAsync({
+  //     id: winner?.id ?? '',
+  //     name: winner?.name ?? '',
+  //     imageUrl: winner?.album?.images?.[0]?.url || '',
+  //     previewURL: winner?.preview_url || '',
+  //   })
 
-    await trackCreation.mutateAsync({
-      id: loser?.id ?? '',
-      name: loser?.name ?? '',
-      imageUrl: loser?.album?.images?.[0]?.url || '',
-      previewURL: loser?.preview_url || '',
-    })
+  //   await trackCreation.mutateAsync({
+  //     id: loser?.id ?? '',
+  //     name: loser?.name ?? '',
+  //     imageUrl: loser?.album?.images?.[0]?.url || '',
+  //     previewURL: loser?.preview_url || '',
+  //   })
 
-    // Create a duel with a winner, loser, and the user who voted
-    await duelCreation.mutateAsync({
-      track1Id: currentTracks?.[0]?.id ?? '',
-      track2Id: currentTracks?.[1]?.id ?? '',
-      userId: sessionData?.user.id ?? '',
-      winnerId: winner?.id ?? '',
-      loserId: loser?.id ?? '',
-    })
+  //   // Create a duel with a winner, loser, and the user who voted
+  //   await duelCreation.mutateAsync({
+  //     track1Id: currentTracks?.[0]?.id ?? '',
+  //     track2Id: currentTracks?.[1]?.id ?? '',
+  //     userId: sessionData?.user.id ?? '',
+  //     winnerId: winner?.id ?? '',
+  //     loserId: loser?.id ?? '',
+  //   })
 
-    topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks)
-    await refetchTracksFromDb()
-  }
+  //   topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks)
+  //   await refetchTracksFromDb()
+  // }
 
   return (
     <>
@@ -92,7 +92,7 @@ const Home: NextPage = () => {
       </Head>
       <main className='flex flex-col items-center justify-center gap-12 px-4 py-1 w-full'>
         <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
-        <div className='flex gap-3 justify-around w-full'>
+        {/* <div className='flex gap-3 justify-around w-full'>
           <div className='flex flex-wrap gap-10 items-center justify-center'>
             {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
               <div key={track?.id} className='flex flex-col gap-6'>
@@ -104,7 +104,7 @@ const Home: NextPage = () => {
             ))}
           </div>
           { tracksInDb && <TrackStandings tracks={tracksInDb} /> }
-        </div>
+        </div> */}
         <AuthShowcase />
       </main>
     </>
