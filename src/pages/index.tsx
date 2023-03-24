@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react'
 import Head from "next/head";
 import { type NextPage } from 'next';
 import { signIn, signOut, useSession } from 'next-auth/react';
-
 import { api } from '~/utils/api';
-import { type PlaylistTrack, type Track } from '~/utils/types';
 import Image from 'next/image';
+// import { type PlaylistTrack, type Track } from '~/utils/types';
 
-interface PlaylistTracksData {
-  items: PlaylistTrack[]
-}
+// interface PlaylistTracksData {
+//   items: PlaylistTrack[]
+// }
 
 interface TrackFromDb {
   id: string,
@@ -22,32 +21,32 @@ interface TrackFromDb {
 }
 
 const Home: NextPage = () => {
-  const trackCreation = api.track.createTrack.useMutation()
+  // const trackCreation = api.track.createTrack.useMutation()
+  // const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '', {
+  //   staleTime: 1000 * 60 * 60 * 24,
+  //   cacheTime: 1000 * 60 * 60 * 24,
+  // })
   const duelCreation = api.duel.createDuel.useMutation()
   const { data: sessionData } = useSession()
   const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
-  const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '', {
-    staleTime: 1000 * 60 * 60 * 24,
-    cacheTime: 1000 * 60 * 60 * 24,
-  })
 
-  const [currentTracks, setCurrentTracks] = useState<[Track | null, Track | null]>()
+  const [currentTracks, setCurrentTracks] = useState<[TrackFromDb | null, TrackFromDb | null]>()
  
   useEffect(() => {
-    topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks) 
-  }, [topOneHundredTracks])
+    tracksInDb && getTwoRandomTracks(tracksInDb) 
+  }, [tracksInDb])
 
-  function getTwoRandomTracks(trackList: PlaylistTracksData) {
-    const first = Math.floor(Math.random() * trackList.items.length);
-    let second = Math.floor(Math.random() * trackList.items.length);
+  function getTwoRandomTracks(trackList: TrackFromDb[]) {
+    const first = Math.floor(Math.random() * trackList.length);
+    let second = Math.floor(Math.random() * trackList.length);
 
     while (first === second) {
-      second = Math.floor(Math.random() * trackList.items.length);
+      second = Math.floor(Math.random() * trackList.length);
     }
 
     setCurrentTracks([
-      trackList.items[first]?.track ?? null,
-      trackList.items[second]?.track ?? null
+      trackList[first] ?? null,
+      trackList[second] ?? null
     ])
   }
 
@@ -56,19 +55,19 @@ const Home: NextPage = () => {
     const loser = currentTracks?.[winnerIndex === 0 ? 1 : 0]
 
     //create a track for both winner and loser
-    await trackCreation.mutateAsync({
-      id: winner?.id ?? '',
-      name: winner?.name ?? '',
-      imageUrl: winner?.album?.images?.[0]?.url || '',
-      previewURL: winner?.preview_url || '',
-    })
+    // await trackCreation.mutateAsync({
+    //   id: winner?.id ?? '',
+    //   name: winner?.name ?? '',
+    //   imageUrl: winner?.album?.images?.[0]?.url || '',
+    //   previewURL: winner?.preview_url || '',
+    // })
 
-    await trackCreation.mutateAsync({
-      id: loser?.id ?? '',
-      name: loser?.name ?? '',
-      imageUrl: loser?.album?.images?.[0]?.url || '',
-      previewURL: loser?.preview_url || '',
-    })
+    // await trackCreation.mutateAsync({
+    //   id: loser?.id ?? '',
+    //   name: loser?.name ?? '',
+    //   imageUrl: loser?.album?.images?.[0]?.url || '',
+    //   previewURL: loser?.preview_url || '',
+    // })
 
     // Create a duel with a winner, loser, and the user who voted
     await duelCreation.mutateAsync({
@@ -79,9 +78,23 @@ const Home: NextPage = () => {
       loserId: loser?.id ?? '',
     })
 
-    topOneHundredTracks && getTwoRandomTracks(topOneHundredTracks)
+    tracksInDb && getTwoRandomTracks(tracksInDb)
     await refetchTracksFromDb()
   }
+
+  // const handleCreation = () => {
+  //   console.log(topOneHundredTracks, 'topOneHundredTracks')
+  //   topOneHundredTracks?.items.forEach(track => void create(track.track))
+
+  //   async function create(track: Track) {
+  //     await trackCreation.mutateAsync({
+  //       id: track.id ?? '',
+  //       name: track.name ?? '',
+  //       imageUrl: track.album?.images?.[0]?.url || '',
+  //       previewURL: track.preview_url || '',
+  //     })
+  //   }
+  // }
 
   return (
     <>
@@ -103,7 +116,12 @@ const Home: NextPage = () => {
               </div>
             ))}
           </div>
-          { tracksInDb && <TrackStandings tracks={tracksInDb} /> }
+          {/* { sessionData?.user && tracksInDb &&
+            <button onClick={() => handleCreation()}>
+              CREATE
+            </button>
+          } */}
+          { sessionData?.user && tracksInDb && <TrackStandings tracks={tracksInDb} /> }
         </div>
         <AuthShowcase />
       </main>
@@ -114,10 +132,9 @@ const Home: NextPage = () => {
 export default Home;
 
 const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
-
   const tracksWithWinRate = tracks.map(track => {
     const totalDuels = track.winnerOf.length + track.loserOf.length
-    const winRate = track.winnerOf.length / totalDuels
+    const winRate = totalDuels === 0 ? 0 : track.winnerOf.length / totalDuels
 
     return {
       ...track,
@@ -147,15 +164,15 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
   )
 }
 
-const TrackCard = ({ track } : { track: Track }) => {
+const TrackCard = ({ track } : { track: TrackFromDb }) => {
   return (
     <div className='flex flex-col gap-3 p-6 items-center border-2 rounded'>
-      { track.album.images?.[0]?.url && 
-        <Image alt={track.name} src={track.album.images[0].url} width={300} height={300} />
+      { track.imageUrl && 
+        <Image alt={track.name} src={track.imageUrl} width={300} height={300} />
       }
       <h1 className='text-white text-left w-full text-lg font-bold'>{track.name}</h1>
-      { track.preview_url ?
-        <audio className='w-full' src={track.preview_url} controls /> :
+      { track.previewURL ?
+        <audio className='w-full' src={track.previewURL} controls /> :
         <h1 className='text-white h-full'>This song is missing a preview :&#40;</h1>
       }
     </div>
