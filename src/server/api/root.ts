@@ -12,10 +12,10 @@ import { duelRouter } from './routers/duel';
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
-  // playlist: playlistRouter,
-  // track: trackRouter,
-  // user: userRouter,
-  // duel: duelRouter,
+  playlist: playlistRouter,
+  track: trackRouter,
+  user: userRouter,
+  duel: duelRouter,
 });
 
 // export type definition of API
