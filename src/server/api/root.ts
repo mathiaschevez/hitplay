@@ -4,11 +4,6 @@ import { trackRouter } from './routers/track';
 import { userRouter } from './routers/user';
 import { duelRouter } from './routers/duel';
 
-/**
- * This is the primary router for your server.
- *
- * All routers added in /api/routers should be manually added here.
- */
 export const appRouter = createTRPCRouter({
   playlist: playlistRouter,
   track: trackRouter,
