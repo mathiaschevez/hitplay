@@ -22,6 +22,18 @@ interface UserTopAlbumsData {
 }
 
 export const userRouter = createTRPCRouter({
+  getAccountFromDb: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input
+        }
+      });
+
+      return account
+    }),
+
   getCurrentUser: publicProcedure
     .input(z.string() || z.null())
     .query(async ({ ctx, input }) => {

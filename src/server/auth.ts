@@ -41,12 +41,13 @@ export const authOptions: NextAuthOptions = {
     jwt({ token, account }) {
       if (account) {
         token.accessToken = account.refresh_token;
+        token.provider = account.provider;
       }
       return token;
     },
     session({ session, user }) {
       if (session.user) {
-        session.user = user
+        session.user = user;
         session.user.id = user.id;
         // session.user.role = user.role; <-- put other properties on the session here
       }
@@ -56,8 +57,7 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     SpotifyProvider({
-      authorization:
-        'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private',
+      authorization: 'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private',
       clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
     }),

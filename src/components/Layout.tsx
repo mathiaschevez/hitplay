@@ -3,6 +3,7 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { api } from '~/utils/api'
 
 export function Layout({ children } : { children: JSX.Element }) {
   return (
@@ -26,10 +27,13 @@ function Navbar() {
 
 const AuthShowcase = () => {
   const { data: sessionData } = useSession();
+  const { data: accountData } = api.user.getAccountFromDb.useQuery(sessionData?.user.id ?? '')
+
   // const { data: secretMessage } = api.example.getSecretMessage.useQuery(
   //   undefined, // no input
   //   { enabled: sessionData?.user !== undefined },
   // );
+
   return (
     <div className="flex items-center justify-center gap-4">
       {/* <p className="text-center text-2xl text-white">
@@ -42,7 +46,7 @@ const AuthShowcase = () => {
       >
         {sessionData ? "Sign out" : "Sign in"}
       </button>
-      { sessionData && 
+      { (sessionData && accountData?.provider === 'spotify') && 
         <Link href='/profile' className='text-white'>
           <Avatar size={39} src={sessionData?.user.image}/>
         </Link>
