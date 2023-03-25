@@ -92,7 +92,7 @@ const Home: NextPage = () => {
       </Head>
       <main className='flex flex-col items-center justify-center gap-12 px-4 py-1 w-full'>
         <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
-        { tracksInDb && sessionData &&
+        { tracksInDb &&
           <div className='flex gap-3 justify-around w-full'>
             <div className='flex flex-wrap gap-10 items-center justify-center'>
               {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
