@@ -105,24 +105,21 @@ const Home: NextPage = () => {
       </Head>
       <main className='flex flex-col items-center justify-center gap-12 px-4 py-1 w-full'>
         <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
-        <div className='flex gap-3 justify-around w-full'>
-          <div className='flex flex-wrap gap-10 items-center justify-center'>
-            {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
-              <div key={track?.id} className='flex flex-col gap-6'>
-                { track && <TrackCard track={track} />}
-                <button onClick={() => void handleVote(i)} className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'>
-                  Vote
-                </button>
-              </div>
-            ))}
+        { sessionData?.user && tracksInDb && 
+          <div className='flex gap-3 justify-around w-full'>
+            <div className='flex flex-wrap gap-10 items-center justify-center'>
+              {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
+                <div key={track?.id} className='flex flex-col gap-6'>
+                  { track && <TrackCard track={track} />}
+                  <button onClick={() => void handleVote(i)} className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'>
+                    Vote
+                  </button>
+                </div>
+              ))}
+            </div>
+            <TrackStandings tracks={tracksInDb} />
           </div>
-          {/* { sessionData?.user && tracksInDb &&
-            <button onClick={() => handleCreation()}>
-              CREATE
-            </button>
-          } */}
-          { sessionData?.user && tracksInDb && <TrackStandings tracks={tracksInDb} /> }
-        </div>
+        }
         <AuthShowcase />
       </main>
     </>
