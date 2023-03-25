@@ -48,7 +48,7 @@ model User {
   image         String?   @db.Text
   accounts      Account[]
   sessions      Session[]
-  seenDuels     Duel[]    @relation("SeenBy")
+  seenDuels     Duel[]
 }
 
 model VerificationToken {
@@ -71,7 +71,7 @@ model Duel {
   winnerId   String?
   loser      Track?   @relation("loser", fields: [loserId], references: [id])
   loserId    String?
-  seenByUser User[]   @relation("SeenBy")
+  seenByUser User[]
 
   @@unique([track1Id])
   @@unique([track2Id])

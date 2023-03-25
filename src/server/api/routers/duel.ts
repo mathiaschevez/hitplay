@@ -41,28 +41,21 @@ export const duelRouter = createTRPCRouter({
         })
 
         return updatedDuelWithUser
-      }
-
-      const newDuel = await ctx.prisma.duel.create({
-        data: {
-          track1Id: input.track1Id,
-          track2Id: input.track2Id,
-          userId: input.userId,
-          winnerId: input.winnerId,
-          loserId: input.loserId,
-        }
-      })
-
-      const updatedDuelWithUser = await ctx.prisma.duel.update({
-        where: { id: newDuel.id },
-        data: {
-          seenByUser: {
-            connect: { id: input.userId }
+      } else {
+        const newDuel = await ctx.prisma.duel.create({
+          data: {
+            track1Id: input.track1Id,
+            track2Id: input.track2Id,
+            userId: input.userId,
+            winnerId: input.winnerId,
+            loserId: input.loserId,
+            seenByUser: {
+              connect: { id: input.userId }
+            }
           }
-        }
-      })
+        })
 
-      console.log(updatedDuelWithUser, 'DUEL UPDATED WITH USER')
-      return updatedDuelWithUser;
+        return newDuel
+      }
     }),
 });

@@ -33,8 +33,8 @@ const Home: NextPage = () => {
   const [currentTracks, setCurrentTracks] = useState<[TrackFromDb | null, TrackFromDb | null]>()
  
   useEffect(() => {
-    tracksInDb && getTwoRandomTracks(tracksInDb) 
-  }, [tracksInDb])
+    tracksInDb && !currentTracks && getTwoRandomTracks(tracksInDb) 
+  }, [tracksInDb, currentTracks])
 
   function getTwoRandomTracks(trackList: TrackFromDb[]) {
     const first = Math.floor(Math.random() * trackList.length);
@@ -51,35 +51,22 @@ const Home: NextPage = () => {
   }
 
   const handleVote = async (winnerIndex: number) => {
-    const winner = currentTracks?.[winnerIndex]
-    const loser = currentTracks?.[winnerIndex === 0 ? 1 : 0]
+    if(sessionData) {
+      const winner = currentTracks?.[winnerIndex]
+      const loser = currentTracks?.[winnerIndex === 0 ? 1 : 0]
+      
+      await duelCreation.mutateAsync({
+        track1Id: currentTracks?.[0]?.id ?? '',
+        track2Id: currentTracks?.[1]?.id ?? '',
+        userId: sessionData.user.id ?? '',
+        winnerId: winner?.id ?? '',
+        loserId: loser?.id ?? '',
+      })
 
-    //create a track for both winner and loser
-    // await trackCreation.mutateAsync({
-    //   id: winner?.id ?? '',
-    //   name: winner?.name ?? '',
-    //   imageUrl: winner?.album?.images?.[0]?.url || '',
-    //   previewURL: winner?.preview_url || '',
-    // })
-
-    // await trackCreation.mutateAsync({
-    //   id: loser?.id ?? '',
-    //   name: loser?.name ?? '',
-    //   imageUrl: loser?.album?.images?.[0]?.url || '',
-    //   previewURL: loser?.preview_url || '',
-    // })
-
-    // Create a duel with a winner, loser, and the user who voted
-    await duelCreation.mutateAsync({
-      track1Id: currentTracks?.[0]?.id ?? '',
-      track2Id: currentTracks?.[1]?.id ?? '',
-      userId: sessionData?.user.id ?? '',
-      winnerId: winner?.id ?? '',
-      loserId: loser?.id ?? '',
-    })
+      await refetchTracksFromDb()
+    }
 
     tracksInDb && getTwoRandomTracks(tracksInDb)
-    await refetchTracksFromDb()
   }
 
   // const handleCreation = () => {
@@ -105,7 +92,7 @@ const Home: NextPage = () => {
       </Head>
       <main className='flex flex-col items-center justify-center gap-12 px-4 py-1 w-full'>
         <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
-        { sessionData?.user && tracksInDb && 
+        { tracksInDb &&
           <div className='flex gap-3 justify-around w-full'>
             <div className='flex flex-wrap gap-10 items-center justify-center'>
               {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
@@ -129,6 +116,8 @@ const Home: NextPage = () => {
 export default Home;
 
 const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
+  const { data: sessionData } = useSession()
+
   const tracksWithWinRate = tracks.map(track => {
     const totalDuels = track.winnerOf.length + track.loserOf.length
     const winRate = totalDuels === 0 ? 0 : track.winnerOf.length / totalDuels
@@ -143,7 +132,10 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
 
   return (
     <div className='border rounded p-6 w-[33%]'>
-      <h1 className='font-bold text-3xl text-[hsl(280,100%,70%)] mb-3'>TRACK STANDINGS</h1>
+      <div className='flex flex-col mb-6 gap-1'>
+        <h1 className='font-bold text-3xl text-[hsl(280,100%,70%)]'>TRACK STANDINGS</h1>
+        { !sessionData && <h1 className='text-white font-bold'>To update standings, sign in!</h1>}
+      </div>
       {sortedTracks?.slice(0, 20).map((track, i) => (
         <div key={track.id} className='text-white flex gap-3'>
           <div className='flex justify-between w-full'>
@@ -162,16 +154,24 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
 }
 
 const TrackCard = ({ track } : { track: TrackFromDb }) => {
+  const { data: sessionData } = useSession()
+
   return (
     <div className='flex flex-col gap-3 p-6 items-center border-2 rounded'>
       { track.imageUrl && 
         <Image alt={track.name} src={track.imageUrl} width={300} height={300} />
       }
       <h1 className='text-white text-left w-full text-lg font-bold'>{track.name}</h1>
-      { track.previewURL ?
-        <audio className='w-full' src={track.previewURL} controls /> :
-        <h1 className='text-white h-full'>This song is missing a preview :&#40;</h1>
+      { sessionData?.user ?
+        <>
+          { track.previewURL ?
+            <audio className='w-full' src={track.previewURL} controls /> :
+            <h1 className='text-white h-full'>This song is missing a preview :&#40;</h1>
+          }
+        </> :
+        <h1 className='text-white h-full'>Sign in to hear a preview!</h1>
       }
+      
     </div>
   )
 }
