@@ -7,7 +7,7 @@ import { api } from '~/utils/api'
 
 export function Layout({ children } : { children: JSX.Element }) {
   return (
-    <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#2e026d] to-[#15162c] pb-8'>
+    <div className='flex min-h-screen flex-col items-center bg-gradient-to-b from-[#090446] to-[#1A0BC1] pb-8'>
       <Navbar />
       {children}
     </div>
@@ -18,7 +18,7 @@ function Navbar() {
   return(
     <div className='flex items-center w-full justify-between gap-12 px-8 pt-6 pb-3'>
       <Link href='/' className='text-white'>
-        <Image alt='Home' src='/hitplaylogo.png' width={45} height={45} />
+        <Image alt='Home' src='/hitplayLogo.png' width={45} height={45} />
       </Link>
       <AuthShowcase />
     </div>

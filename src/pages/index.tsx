@@ -92,15 +92,15 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className='flex flex-col items-center justify-center px-4 py-1 w-full flex-1'>
-        <h1 className='text-5xl text-[hsl(280,100%,70%)] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
-        <div className='flex gap-3 justify-around w-full flex-1 items-center'>
+        <h1 className='text-5xl text-[#7165F6] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
+        <div className='flex justify-around w-full flex-1 items-center'>
           { tracksInDb && currentTracks ?
             <>
-              <div className='flex flex-wrap gap-10 items-center justify-center'>
+              <div className='flex flex-wrap gap-16 items-center justify-center'>
                 {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
                   <div key={track?.id} className='flex flex-col gap-6'>
                     { track && <TrackCard track={track} />}
-                    <button onClick={() => void handleVote(i)} className='text-white font-bold border-2 rounded-full py-2 hover:bg-purple-600'>
+                    <button onClick={() => void handleVote(i)} className='text-white font-bold border-2 rounded-full py-2 hover:bg-[#7165F6]'>
                       Vote
                     </button>
                   </div>
@@ -136,20 +136,18 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
   return (
     <div className='border rounded p-6 w-[33%]'>
       <div className='flex flex-col mb-6 gap-1'>
-        <h1 className='font-bold text-3xl text-[hsl(280,100%,70%)]'>TRACK STANDINGS</h1>
+        <h1 className='font-extrabold text-3xl text-[#7165F6]'>TRACK STANDINGS</h1>
         { !sessionData && <h1 className='text-white font-bold'>To update standings, sign in!</h1>}
       </div>
       {sortedTracks?.slice(0, 20).map((track, i) => (
-        <div key={track.id} className='text-white flex gap-3'>
-          <div className='flex justify-between w-full'>
-            <div>
-              <span>{i + 1}. </span>
-              <span className='font-semibold text-lg'>{track.name}</span>
-            </div>
-            <span className='text-[hsl(280,100%,70%)] font-bold'>
-              {track.winRate.toFixed()}%
-            </span>
+        <div key={track.id} className='flex justify-between w-full text-white'>
+          <div>
+            <span>{i + 1}. </span>
+            <span className='font-semibold text-lg'>{track.name}</span>
           </div>
+          <span className='text-[#7165F6] font-bold'>
+            {track.winRate.toFixed()}%
+          </span>
         </div>
       ))}
     </div>
@@ -162,17 +160,17 @@ const TrackCard = ({ track } : { track: TrackFromDb }) => {
   return (
     <div className='flex flex-col gap-3 p-6 items-center border-2 rounded'>
       { track.imageUrl && 
-        <Image alt={track.name} src={track.imageUrl} width={300} height={300} />
+        <Image alt={track.name} src={track.imageUrl} width={315} height={315} />
       }
-      <h1 className='text-white text-left w-full text-lg font-bold'>{track.name}</h1>
+      <h1 className='text-white text-left w-full text-lg font-extrabold'>{track.name}</h1>
       { sessionData?.user ?
         <>
           { track.previewURL ?
             <audio className='w-full' src={track.previewURL} controls /> :
-            <h1 className='text-white h-full'>This song is missing a preview :&#40;</h1>
+            <h1 className='text-white h-full font-bold'>This song is missing a preview :&#40;</h1>
           }
         </> :
-        <h1 className='text-white h-full'>Sign in to hear a preview!</h1>
+        <h1 className='text-white h-full font-bold'>Sign in to hear a preview!</h1>
       }
     </div>
   )

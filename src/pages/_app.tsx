@@ -21,7 +21,7 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
 const themeConfig = {
   algorithm: theme.darkAlgorithm,
   token: {
-    colorPrimary: '#AB77F8',
+    colorPrimary: '#7165F6',
   },
 }
 
