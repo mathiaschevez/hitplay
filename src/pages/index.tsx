@@ -5,11 +5,6 @@ import { useSession } from 'next-auth/react';
 import { api } from '~/utils/api';
 import Image from 'next/image';
 import { Spin } from 'antd';
-// import { type PlaylistTrack, type Track } from '~/utils/types';
-
-// interface PlaylistTracksData {
-//   items: PlaylistTrack[]
-// }
 
 interface TrackFromDb {
   id: string,
@@ -22,11 +17,6 @@ interface TrackFromDb {
 }
 
 const Home: NextPage = () => {
-  // const trackCreation = api.track.createTrack.useMutation()
-  // const { data: topOneHundredTracks } = api.track.getTopOneHundredAllTimeTracks.useQuery(sessionData?.user.id ?? '', {
-  //   staleTime: 1000 * 60 * 60 * 24,
-  //   cacheTime: 1000 * 60 * 60 * 24,
-  // })
   const duelCreation = api.duel.createDuel.useMutation()
   const { data: sessionData } = useSession()
   const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
@@ -70,20 +60,6 @@ const Home: NextPage = () => {
     tracksInDb && getTwoRandomTracks(tracksInDb)
   }
 
-  // const handleCreation = () => {
-  //   console.log(topOneHundredTracks, 'topOneHundredTracks')
-  //   topOneHundredTracks?.items.forEach(track => void create(track.track))
-
-  //   async function create(track: Track) {
-  //     await trackCreation.mutateAsync({
-  //       id: track.id ?? '',
-  //       name: track.name ?? '',
-  //       imageUrl: track.album?.images?.[0]?.url || '',
-  //       previewURL: track.preview_url || '',
-  //     })
-  //   }
-  // }
-
   return (
     <>
       <Head>
@@ -92,11 +68,11 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main className='flex flex-col items-center justify-center px-4 py-1 w-full flex-1'>
-        <h1 className='text-5xl text-[#7165F6] font-extrabold tracking-tight sm:text-[5rem]'>Hitplay</h1>
-        <div className='flex justify-around w-full flex-1 items-center'>
+        <h1 className='text-5xl text-[#7165F6] font-extrabold sm:text-[5rem]'>Hitplay</h1>
+        <div className='flex flex-col xl:flex-row gap-10 xl:gap-0 justify-around w-full flex-1 items-center'>
           { tracksInDb && currentTracks ?
             <>
-              <div className='flex flex-wrap gap-16 items-center justify-center'>
+              <div className='flex flex-wrap gap-16 items-center justify-center mt-10 xl:mt-0'>
                 {currentTracks?.[0] && currentTracks?.[1] && currentTracks?.map((track, i) => (
                   <div key={track?.id} className='flex flex-col gap-6'>
                     { track && <TrackCard track={track} />}
@@ -134,7 +110,7 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
   const sortedTracks = tracksWithWinRate.sort((a, b) => b.winRate - a.winRate)
 
   return (
-    <div className='border-2 rounded p-6 w-[33%]'>
+    <div className='border-2 rounded p-6 w-full xl:w-[33%]'>
       <div className='flex flex-col mb-6 gap-1'>
         <h1 className='font-extrabold text-3xl text-[#7165F6]'>TRACK STANDINGS</h1>
         { !sessionData && <h1 className='text-white font-bold'>Sign in to update standings!</h1>}

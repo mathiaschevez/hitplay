@@ -1,6 +1,6 @@
 import { type GetServerSidePropsContext } from "next";
 import {getServerSession, type NextAuthOptions, type DefaultSession } from "next-auth";
-import SpotifyProvider from "next-auth/providers/spotify";
+// import SpotifyProvider from "next-auth/providers/spotify";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "~/server/db";
@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
     jwt({ token, account }) {
       if (account) {
         token.accessToken = account.refresh_token;
-        token.provider = account.provider;
+        // token.provider = account.provider;
       }
       return token;
     },
