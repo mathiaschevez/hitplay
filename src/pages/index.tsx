@@ -87,7 +87,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>HitPlay</title>
+        <title>Hitplay</title>
         <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
