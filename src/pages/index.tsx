@@ -137,7 +137,7 @@ const TrackStandings = ({ tracks }: { tracks: TrackFromDb[] }) => {
     <div className='border-2 rounded p-6 w-[33%]'>
       <div className='flex flex-col mb-6 gap-1'>
         <h1 className='font-extrabold text-3xl text-[#7165F6]'>TRACK STANDINGS</h1>
-        { !sessionData && <h1 className='text-white font-bold'>To update standings, sign in!</h1>}
+        { !sessionData && <h1 className='text-white font-bold'>Sign in to update standings!</h1>}
       </div>
       {sortedTracks?.slice(0, 20).map((track, i) => (
         <div key={track.id} className='flex justify-between w-full text-white'>

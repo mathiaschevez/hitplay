@@ -18,7 +18,7 @@ function Navbar() {
   return(
     <div className='flex items-center w-full justify-between gap-12 px-8 pt-6 pb-3'>
       <Link href='/' className='text-white'>
-        <Image alt='Home' src='/hitplaylogo.png' width={45} height={45} />
+        <Image alt='Home' src='/hitplaylogo.png' width={50} height={50} />
       </Link>
       <AuthShowcase />
     </div>

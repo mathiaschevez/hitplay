@@ -47,11 +47,11 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    SpotifyProvider({
-      authorization: 'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private',
-      clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
-    }),
+    // SpotifyProvider({
+    //   authorization: 'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private',
+    //   clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
+    //   clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
+    // }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ''
