@@ -44,7 +44,7 @@ function Sidebar() {
         { sidebarOpen ? <BsArrowLeftSquare size={30} /> : <BsArrowRightSquare size={30} />}
       </button>
       <SideBarItem title='Create' sideBarOpen={sidebarOpen} />
-      <SideBarItem title='Songs' sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Tracks' sideBarOpen={sidebarOpen} />
       <SideBarItem title='Playlists' sideBarOpen={sidebarOpen} />
       <SideBarItem title='Duels' sideBarOpen={sidebarOpen} />
     </div>

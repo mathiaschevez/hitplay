@@ -15,7 +15,7 @@ export const impactRouter = createTRPCRouter({
 
       try {
         const completion = await openai.createCompletion({
-          model: "text-davinci-003",
+          model: 'text-davinci-003', //gpt-3.5-turbo
           prompt: `In two sentences, ${input.text}`,
           temperature: 0.6,
           max_tokens: 50,

@@ -74,7 +74,7 @@ const Duels: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Hitplay</title>
+        <title>Duels</title>
         <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
