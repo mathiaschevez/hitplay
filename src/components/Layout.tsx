@@ -46,6 +46,7 @@ function Sidebar() {
       <SideBarItem title='Create' sideBarOpen={sidebarOpen} />
       <SideBarItem title='Tracks' sideBarOpen={sidebarOpen} />
       <SideBarItem title='Playlists' sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Artists' sideBarOpen={sidebarOpen} />
       <SideBarItem title='Duels' sideBarOpen={sidebarOpen} />
     </div>
   )
