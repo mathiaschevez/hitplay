@@ -4,7 +4,6 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
-import { Layout } from '~/components/Layout';
 import { api } from '~/utils/api';
 import { Playlist } from '~/utils/types';
 
@@ -19,13 +18,11 @@ const Playlists: NextPage = () => {
         <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Layout>
-        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6'>
-          {playlists && playlists.map(p => (
-            <Playlist key={p.id} playlist={p} />
-          ))}
-        </div>
-      </Layout>
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6'>
+        {playlists && playlists.map(p => (
+          <Playlist key={p.id} playlist={p} />
+        ))}
+      </div>
     </>
   )
 }

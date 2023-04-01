@@ -1,10 +1,15 @@
-import { useState } from 'react'
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { BsArrowLeftSquare } from 'react-icons/bs'
 import { BsArrowRightSquare } from 'react-icons/bs'
+import { MdOutlineCreate, MdOutlineMusicNote } from 'react-icons/md'
+import { IoPersonOutline } from 'react-icons/io5'
+import { GiMusicalNotes } from 'react-icons/gi'
+import { CgCompress } from 'react-icons/cg'
+import { selectSideBarOpen, setSideBarOpen } from '~/store/reducers/navigationSlice'
+import { useAppDispatch, useAppSelector } from '~/hooks'
 
 export function Layout({ children } : { children: JSX.Element }) {
   return (
@@ -36,26 +41,27 @@ function Navbar() {
 }
 
 function Sidebar() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const dispatch = useAppDispatch()
+  const sidebarOpen = useAppSelector(selectSideBarOpen)
 
   return (
-    <div className={`border-r ${sidebarOpen ? 'w-72' : ''} flex flex-col p-3`}>
-      <button onClick={() => setSidebarOpen(!sidebarOpen)} className='flex justify-end text-white mb-9'>
+    <div className={`border-r ${sidebarOpen ? 'w-72' : ' items-center'} flex flex-col p-3`}>
+      <button onClick={() => dispatch(setSideBarOpen(!sidebarOpen))} className='flex justify-end text-white mb-9'>
         { sidebarOpen ? <BsArrowLeftSquare size={30} /> : <BsArrowRightSquare size={30} />}
       </button>
-      <SideBarItem title='Create' sideBarOpen={sidebarOpen} />
-      <SideBarItem title='Tracks' sideBarOpen={sidebarOpen} />
-      <SideBarItem title='Playlists' sideBarOpen={sidebarOpen} />
-      <SideBarItem title='Artists' sideBarOpen={sidebarOpen} />
-      <SideBarItem title='Duels' sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Create' icon={<MdOutlineCreate size={24} />} sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Tracks' icon={<MdOutlineMusicNote size={24} />} sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Playlists' icon={<GiMusicalNotes size={24} />} sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Artists' icon={<IoPersonOutline size={24} />} sideBarOpen={sidebarOpen} />
+      <SideBarItem title='Duels' icon={<CgCompress size={24} />} sideBarOpen={sidebarOpen} />
     </div>
   )
 }
 
-function SideBarItem({ title, sideBarOpen }: { title: string, sideBarOpen: boolean }) {
+function SideBarItem({ title, icon, sideBarOpen }: { title: string, icon: JSX.Element, sideBarOpen: boolean }) {
   return (
-    <Link href={`/${title.toLowerCase()}`} className='p-3 mb-6 border-2 rounded-lg text-center font-bold text-white text-lg hover:bg-white hover:text-black'>
-      {sideBarOpen ? title : ''}
+    <Link href={`/${title.toLowerCase()}`} className={`${sideBarOpen ? 'p-3' : 'p-1'} mb-6 border-2 rounded-lg text-center font-bold text-white text-lg hover:bg-white hover:text-black`}>
+      { sideBarOpen ? title : icon }
     </Link>
   )
 }

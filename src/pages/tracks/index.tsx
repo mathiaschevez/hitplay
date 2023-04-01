@@ -3,7 +3,6 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
 import React from 'react'
-import { Layout } from '~/components/Layout'
 import { api } from '~/utils/api'
 import { type Track } from '~/utils/types'
 
@@ -18,13 +17,11 @@ const Tracks: NextPage = () => {
         <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Layout>
-        <div className='grid grid-cols-4 gap-6 p-6'>
-          {topTracks?.items.map((track, i: number) => (
-            <TopTrack key={track.id} track={track} rank={i + 1} />
-          ))}
-        </div>
-      </Layout>
+      <div className='grid grid-cols-4 gap-6 p-6'>
+        {topTracks?.items.map((track, i: number) => (
+          <TopTrack key={track.id} track={track} rank={i + 1} />
+        ))}
+      </div>
     </>
   )
 }

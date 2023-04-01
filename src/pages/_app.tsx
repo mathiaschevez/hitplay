@@ -4,13 +4,20 @@ import { SessionProvider } from "next-auth/react";
 import { api } from "~/utils/api";
 import { ConfigProvider, theme } from "antd";
 import "~/styles/globals.css";
+import { Provider } from "react-redux";
+import { store } from "~/store/store";
+import { Layout } from "~/components/Layout";
 
 const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
     <SessionProvider session={session}>
-      <ConfigProvider theme={themeConfig}>
-        <Component {...pageProps} />
-      </ConfigProvider>
+      <Provider store={store}>
+        <ConfigProvider theme={themeConfig}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ConfigProvider>
+      </Provider>
     </SessionProvider>
   )
 };

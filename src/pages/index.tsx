@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { type NextPage } from 'next';
 import { signIn, useSession } from 'next-auth/react';
-import { Layout } from "~/components/Layout";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession()
@@ -24,9 +23,7 @@ export default Home;
 
 function Main() {
   return (
-    <Layout>
-      <div>Main</div>
-    </Layout>
+    <div>Main</div>
   )
 }
 
