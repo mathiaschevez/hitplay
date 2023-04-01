@@ -16,7 +16,7 @@ export function Layout({ children } : { children: JSX.Element }) {
 
   return (
     <>
-      { sessionData ? 
+      { sessionData ?
         <div className='flex min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1]'>
           <Sidebar />
           <div className='flex flex-col min-h-screen justify-between w-full'>
