@@ -1,4 +1,4 @@
-import { signOut } from 'next-auth/react'
+import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -12,13 +12,33 @@ import { selectSideBarOpen, setSideBarOpen } from '~/store/reducers/navigationSl
 import { useAppDispatch, useAppSelector } from '~/hooks'
 
 export function Layout({ children } : { children: JSX.Element }) {
+  const { data: sessionData } = useSession()
+
   return (
-    <div className='flex min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1]'>
-      <Sidebar />
-      <div className='flex flex-col min-h-screen justify-between w-full'>
-        <Navbar />
-        {children}
-      </div>
+    <>
+      { sessionData ? 
+        <div className='flex min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1]'>
+          <Sidebar />
+          <div className='flex flex-col min-h-screen justify-between w-full'>
+            <Navbar />
+            {children}
+          </div>
+        </div> : <Auth />
+      }
+    </>
+  )
+}
+
+function Auth() {
+  return (
+    <div className='flex flex-col min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1] w-screen items-center justify-center'>
+      <h1 className='text-5xl text-[#7165F6] font-extrabold sm:text-[5rem] mb-9'>Hitplay</h1>
+      <button
+        className='rounded-full w-72 bg-white/10 px-10 py-2 font-semibold text-white no-underline transition hover:bg-white/20'
+        onClick={() => void signIn()}
+      >
+        Sign In
+      </button>
     </div>
   )
 }
