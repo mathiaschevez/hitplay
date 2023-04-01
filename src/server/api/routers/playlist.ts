@@ -22,16 +22,16 @@ interface CreatedPlaylistData {
 
 export const playlistRouter = createTRPCRouter({
   createPlaylist: publicProcedure
-    .input(z.object({ userId: z.string(), userSpotifyId: z.string() }))
+    .input(z.object({ userId: z.string(), userSpotifyId: z.string(), title: z.string(), description: z.string()}))
     .mutation(async ({ ctx, input }) => {
-      if(!input) return null
+      if(!input.userId || !input.userSpotifyId || input.title.length === 0) return null
       const account = await ctx.prisma.account.findFirst({
         where: {
           userId: input.userId
         }
       });
 
-      const playlist = await createPlaylist(account?.refresh_token ?? '', input.userSpotifyId)
+      const playlist = await createPlaylist(account?.refresh_token ?? '', input.userSpotifyId, input.title, input.description)
       return playlist
     }),
 
@@ -64,7 +64,7 @@ export const playlistRouter = createTRPCRouter({
     }),
 });
 
-async function createPlaylist(refresh_token: string, userSpotifyId: string) {
+async function createPlaylist(refresh_token: string, userSpotifyId: string, title: string, description: string) {
   const { access_token  } = await getAccessToken(refresh_token);
 
   const playlist = await(await fetch(CREATE_PLAYLIST_ENDPOINT(userSpotifyId), {
@@ -74,8 +74,8 @@ async function createPlaylist(refresh_token: string, userSpotifyId: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: 'TEST PLAYLIST',
-      description: 'My Playlist Description',
+      name: {title},
+      description: {description},
       public: false,
     }),
   })).json() as CreatedPlaylistData

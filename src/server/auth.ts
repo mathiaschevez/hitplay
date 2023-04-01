@@ -1,7 +1,7 @@
 import { type GetServerSidePropsContext } from "next";
 import {getServerSession, type NextAuthOptions, type DefaultSession } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
-import GoogleProvider from "next-auth/providers/google";
+// import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "~/server/db";
 // import { env } from "~/env.mjs";
@@ -52,10 +52,10 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ''
-    })
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ''
+    // })
   ],
 };
 

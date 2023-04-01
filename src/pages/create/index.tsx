@@ -51,32 +51,36 @@ const HelperAi = () => {
 }
 
 const CreateSection = () => {
-  // const { data: sessionData } = useSession()
-  // const { data: spotifyUser } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
-  // const playlistCreation = api.playlist.createPlaylist.useMutation()
-  // console.log(spotifyUser)
+  const { data: sessionData } = useSession()
+  const { data: spotifyUser } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
+  const playlistCreation = api.playlist.createPlaylist.useMutation()
 
-  // const handlePlaylistCreation = async () => {
-  //   if (sessionData && spotifyUser) {
-  //     const playlist = await playlistCreation.mutateAsync({
-  //       userId: sessionData.user.id,
-  //       userSpotifyId: spotifyUser.id,
-  //     })
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
 
-  //     console.log(playlist)
-  //   }
-  // }
+  const handlePlaylistCreation = async () => {
+    if (sessionData && spotifyUser) {
+      const playlist = await playlistCreation.mutateAsync({
+        userId: sessionData.user.id,
+        userSpotifyId: spotifyUser.id,
+        title,
+        description
+      })
+
+      console.log(playlist)
+    }
+  }
 
   return (
     <div className='p-6 flex flex-col justify-between flex-1'>
       <div className='flex flex-col h-full'>
-        <Input className='bg-transparent border-2 border-white text-lg font-bold' placeholder='Title' />
-        <Input className='bg-transparent border-2 border-white text-lg font-bold mt-6' placeholder='Description' />
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} className='bg-transparent border-2 border-white text-lg font-bold' placeholder='Title' />
+        <Input value={description} onChange={(e) => setDescription(e.target.value)} className='bg-transparent border-2 border-white text-lg font-bold mt-6' placeholder='Description' />
         <div className='mt-6 border-2 rounded-lg flex-1'>
           <h1 className='text-white font-bold text-lg p-3'>AI Suggestions</h1>
         </div>
       </div>
-      {/* <button onClick={() => void handlePlaylistCreation()} className='border-2 rounded-lg w-full text-white py-3 px-2 text-lg font-bold mt-6'>Create</button> */}
+      <button onClick={() => void handlePlaylistCreation()} className='border-2 rounded-lg w-full text-white py-3 px-2 text-lg font-bold mt-6'>Create</button>
     </div>
   )
 }
