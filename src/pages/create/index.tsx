@@ -25,10 +25,10 @@ const Create = () => {
         <div className='flex flex-col w-full'>
           <h1 className='text-white text-5xl font-bold mb-6 px-6 pt-6'>CREATE</h1>
           <div className='flex w-full justify-between border-b pb-6 px-6'>
-            <button onClick={() => setActiveSection('create')} className='text-white font-bold border-2 py-2 px-3 rounded-lg text-xl hover:bg-white hover:text-black'>
+              <button onClick={() => setActiveSection('create')} className={`${activeSection === 'create' ? 'bg-white text-black' : 'text-white'} font-bold border-2 py-2 px-3 rounded-lg text-xl hover:bg-white hover:text-black`}>
               Create a new playlist
             </button>
-            <button onClick={() => setActiveSection('add')} className='text-white font-bold border-2 py-2 px-3 rounded-lg text-xl hover:bg-white hover:text-black'>
+            <button onClick={() => setActiveSection('add')} className={`${activeSection === 'add' ? 'bg-white text-black' : 'text-white'} font-bold border-2 py-2 px-3 rounded-lg text-xl hover:bg-white hover:text-black`}>
               Add to an existing playlist
             </button>
           </div>
