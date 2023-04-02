@@ -27,7 +27,7 @@ export function Layout({ children } : { children: JSX.Element }) {
             <Sidebar sidebarOpen={sidebarOpen} />
             <div className='flex flex-col justify-between w-full min-h-screen'>
               <Navbar sidebarOpen={sidebarOpen} />
-              <div className={`${sidebarOpen ? 'ml-72' : 'ml-16'} mt-16`}>{children}</div>
+              <div className={`${sidebarOpen ? 'ml-64' : 'ml-16'} mt-16 h-full`}>{children}</div>
             </div>
           </div> : <Auth />
       }
@@ -37,7 +37,7 @@ export function Layout({ children } : { children: JSX.Element }) {
 
 function Navbar({ sidebarOpen }: { sidebarOpen: boolean }) {
   return(
-    <div className={`${sidebarOpen ? 'pl-[305px]' : 'pl-20'} fixed h-16 border-b flex w-full justify-between pr-4 py-3 bg-[#0B132B]`}>
+    <div className={`${sidebarOpen ? 'pl-[280px]' : 'pl-20'} fixed h-16 border-b flex w-full justify-between pr-4 py-3 bg-[#0B132B] z-40`}>
       <Link href='/' className='text-white flex gap-3 items-center'>
         <Image alt='Home' src='/hitplaylogo.png' width={50} height={50} />
         <h1 className='text-3xl text-[#7165F6] font-extrabold'>Hitplay</h1>
@@ -56,8 +56,8 @@ function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const dispatch = useAppDispatch()
 
   return (
-    <div className={`border-r ${sidebarOpen ? 'w-72' : 'w-16 items-center'} fixed flex flex-col p-3 h-full z-50 bg-[#0B132B]`}>
-      <button onClick={() => dispatch(setSideBarOpen(!sidebarOpen))} className='flex justify-end text-white mb-9'>
+    <div className={`border-r ${sidebarOpen ? 'w-64' : 'w-16 items-center'} fixed flex flex-col p-3 h-full z-50 bg-[#0B132B]`}>
+      <button onClick={() => dispatch(setSideBarOpen(!sidebarOpen))} className={`${sidebarOpen ? 'justify-end' : 'mx-auto'} flex text-white mb-9 hover`}>
         { sidebarOpen ? <BsArrowLeftSquare size={30} /> : <BsArrowRightSquare size={30} />}
       </button>
       <SideBarItem title='Create' icon={<MdOutlineCreate size={24} />} sideBarOpen={sidebarOpen} />
@@ -71,7 +71,7 @@ function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
 function SideBarItem({ title, icon, sideBarOpen }: { title: string, icon: JSX.Element, sideBarOpen: boolean }) {
   return (
-    <Link href={`/${title.toLowerCase()}`} className={`${sideBarOpen ? 'p-3' : 'p-1'} mb-6 border-2 rounded-lg text-center font-bold text-white text-lg hover:bg-white hover:text-black`}>
+    <Link href={`/${title.toLowerCase()}`} className={`${sideBarOpen ? 'py-2' : 'p-1'} mb-6 border-2 rounded-lg text-center font-bold text-white text-lg hover:bg-white hover:text-black`}>
       { sideBarOpen ? title : icon }
     </Link>
   )
