@@ -21,13 +21,16 @@ export const creationSlice = createSlice({
     addSelectedTrack: (state, action: PayloadAction<Track>) => {
       state.selectedTracks.push(action.payload)
     },
-    removeSelectedTracks: (state) => {
+    removeSelectedTrack: (state, action: PayloadAction<{trackId: string}>) => {
+      state.selectedTracks = state.selectedTracks.filter(track => track.id !== action.payload.trackId)
+    },
+    clearSelectedTracks: (state) => {
       state.selectedTracks = []
     }
   }
 })
 
-export const { addSelectedTrack, removeSelectedTracks } = creationSlice.actions
+export const { addSelectedTrack, removeSelectedTrack, clearSelectedTracks } = creationSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectSelectedTracks = (state: RootState) => state.creation.selectedTracks

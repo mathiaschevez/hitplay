@@ -4,7 +4,7 @@ import Head from 'next/head'
 import React from 'react'
 import { api } from '~/utils/api'
 import { Input } from 'antd'
-import { addSelectedTrack, removeSelectedTracks, selectSelectedTracks } from '~/store/reducers/creationSlice'
+import { addSelectedTrack, clearSelectedTracks, removeSelectedTrack, selectSelectedTracks } from '~/store/reducers/creationSlice'
 import { useAppDispatch, useAppSelector } from '~/hooks'
 import { type Track } from '~/utils/types'
 import { VscDiffAdded } from 'react-icons/vsc'
@@ -80,7 +80,7 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
       console.log(playlistWithTracks, 'PLAYLIST WITH TRACKS')
     }
 
-    dispatch(removeSelectedTracks())
+    dispatch(clearSelectedTracks())
     setTitle('')
     setDescription('')
   }
@@ -96,7 +96,7 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
             <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
               <div>{track.name}</div>
               { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ? 
-                <AiFillCheckCircle size={27} /> :
+                <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
                 <button onClick={() => dispatch(addSelectedTrack(track))}><VscDiffAdded size={27} /></button>
               }
             </div>
