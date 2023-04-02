@@ -10,42 +10,34 @@ import { GiMusicalNotes } from 'react-icons/gi'
 import { CgCompress } from 'react-icons/cg'
 import { selectSideBarOpen, setSideBarOpen } from '~/store/reducers/navigationSlice'
 import { useAppDispatch, useAppSelector } from '~/hooks'
+import { Spin } from 'antd'
 
 export function Layout({ children } : { children: JSX.Element }) {
-  const { data: sessionData } = useSession()
+  const { data: sessionData, status } = useSession()
+  const sidebarOpen = useAppSelector(selectSideBarOpen)
 
   return (
     <>
-      { sessionData ?
-        <div className='flex min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1]'>
-          <Sidebar />
-          <div className='flex flex-col min-h-screen justify-between w-full'>
-            <Navbar />
-            {children}
-          </div>
-        </div> : <Auth />
+      { status === 'loading' ?
+          <div className='flex flex-col min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1] w-screen items-center justify-center'>
+            <Spin /> 
+          </div> : 
+        sessionData ?
+          <div className='flex bg-gradient-to-b from-[#090446] to-[#1A0BC1]'>
+            <Sidebar sidebarOpen={sidebarOpen} />
+            <div className='flex flex-col justify-between w-full min-h-screen'>
+              <Navbar sidebarOpen={sidebarOpen} />
+              <div className={`${sidebarOpen ? 'ml-72' : 'ml-16'} mt-16`}>{children}</div>
+            </div>
+          </div> : <Auth />
       }
     </>
   )
 }
 
-function Auth() {
-  return (
-    <div className='flex flex-col min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1] w-screen items-center justify-center'>
-      <h1 className='text-5xl text-[#7165F6] font-extrabold sm:text-[5rem] mb-9'>Hitplay</h1>
-      <button
-        className='rounded-full w-72 bg-white/10 px-10 py-2 font-semibold text-white no-underline transition hover:bg-white/20'
-        onClick={() => void signIn()}
-      >
-        Sign In
-      </button>
-    </div>
-  )
-}
-
-function Navbar() {
+function Navbar({ sidebarOpen }: { sidebarOpen: boolean }) {
   return(
-    <div className='flex items-center w-full justify-between gap-12 px-8 py-3 border-b'>
+    <div className={`${sidebarOpen ? 'pl-[305px]' : 'pl-20'} fixed h-16 border-b flex w-full justify-between pr-4 py-3 bg-[#0B132B]`}>
       <Link href='/' className='text-white flex gap-3 items-center'>
         <Image alt='Home' src='/hitplaylogo.png' width={50} height={50} />
         <h1 className='text-3xl text-[#7165F6] font-extrabold'>Hitplay</h1>
@@ -60,12 +52,11 @@ function Navbar() {
   )
 }
 
-function Sidebar() {
+function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const dispatch = useAppDispatch()
-  const sidebarOpen = useAppSelector(selectSideBarOpen)
 
   return (
-    <div className={`border-r ${sidebarOpen ? 'w-72' : ' items-center'} flex flex-col p-3`}>
+    <div className={`border-r ${sidebarOpen ? 'w-72' : 'w-16 items-center'} fixed flex flex-col p-3 h-full z-50 bg-[#0B132B]`}>
       <button onClick={() => dispatch(setSideBarOpen(!sidebarOpen))} className='flex justify-end text-white mb-9'>
         { sidebarOpen ? <BsArrowLeftSquare size={30} /> : <BsArrowRightSquare size={30} />}
       </button>
@@ -86,22 +77,16 @@ function SideBarItem({ title, icon, sideBarOpen }: { title: string, icon: JSX.El
   )
 }
 
-// const AuthShowcase = () => {
-//   const { data: sessionData } = useSession();
-
-//   return (
-//     <div className="flex items-center justify-center gap-4">
-//       <button
-//         className="rounded-full bg-white/10 px-10 py-2 font-semibold text-white no-underline transition hover:bg-white/20"
-//         onClick={sessionData ? () => void signOut() : () => void signIn()}
-//       >
-//         {sessionData ? "Sign out" : "Sign in"}
-//       </button>
-//       {/* { sessionData && 
-//         <Link href='/profile' className='text-white'>
-//           <Avatar size={39} src={sessionData?.user.image}/>
-//         </Link>
-//       } */}
-//     </div>
-//   );
-// }
+function Auth() {
+  return (
+    <div className='flex flex-col min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1] w-screen items-center justify-center'>
+      <h1 className='text-5xl text-[#7165F6] font-extrabold sm:text-[5rem] mb-9'>Hitplay</h1>
+      <button
+        className='rounded-full w-72 bg-white/10 px-10 py-2 font-semibold text-white no-underline transition hover:bg-white/20'
+        onClick={() => void signIn()}
+      >
+        Sign In
+      </button>
+    </div>
+  )
+}
