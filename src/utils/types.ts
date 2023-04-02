@@ -10,7 +10,8 @@ export type Track = {
     images: {
       url: string
     }[]
-  }
+  },
+  uri: string
 }
 
 export type PlaylistTrack = {

@@ -4,7 +4,7 @@ import Head from 'next/head'
 import React from 'react'
 import { api } from '~/utils/api'
 import { Input } from 'antd'
-import { addSelectedTrack, selectSelectedTracks } from '~/store/reducers/creationSlice'
+import { addSelectedTrack, removeSelectedTracks, selectSelectedTracks } from '~/store/reducers/creationSlice'
 import { useAppDispatch, useAppSelector } from '~/hooks'
 import { type Track } from '~/utils/types'
 import { VscDiffAdded } from 'react-icons/vsc'
@@ -56,26 +56,37 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
   const { data: spotifyUser } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
   const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
   const playlistCreation = api.playlist.createPlaylist.useMutation()
+  const addTracksToPlaylist = api.playlist.addTracksToPlaylist.useMutation()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
-
   const handlePlaylistCreation = async () => {
-    if (sessionData && spotifyUser) {
-      const playlist = await playlistCreation.mutateAsync({
+    if (!sessionData || !spotifyUser) return
+    const playlist = await playlistCreation.mutateAsync({
+      userId: sessionData.user.id,
+      userSpotifyId: spotifyUser.id,
+      title,
+      description
+    })
+
+    if(playlist?.id && selectedTracks.length > 0) {
+      const playlistWithTracks = await addTracksToPlaylist.mutateAsync({
         userId: sessionData.user.id,
-        userSpotifyId: spotifyUser.id,
-        title,
-        description
+        playlistId: playlist?.id,
+        trackList: selectedTracks.map(track => track.uri)
       })
 
-      console.log(playlist)
+      console.log(playlistWithTracks, 'PLAYLIST WITH TRACKS')
     }
+
+    dispatch(removeSelectedTracks())
+    setTitle('')
+    setDescription('')
   }
 
   return (
-    <div className='p-9'>
+    <div className='p-6'>
       <Input value={title} onChange={(e) => setTitle(e.target.value)} className='bg-[#0B132B] border-2 border-white text-lg font-bold' placeholder='Title' />
       <Input value={description} onChange={(e) => setDescription(e.target.value)} className='bg-[#0B132B] border-2 border-white text-lg font-bold mt-6' placeholder='Description' />
       <Input className='border-2 border-white bg-[#0B132B] text-lg font-bold mt-6' placeholder='Search for tracks' />
@@ -100,7 +111,7 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
           ))}
         </div>
       </div>
-      <button onClick={() => void handlePlaylistCreation()} className='border-2 rounded-lg w-full text-white py-3 px-2 text-lg font-bold mt-3'>Create</button>
+      <button disabled={!title} onClick={() => void handlePlaylistCreation()} className='border-2 rounded-lg w-full text-white py-3 px-2 text-lg font-bold mt-3'>Create</button>
     </div>
   )
 }

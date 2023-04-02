@@ -32,6 +32,21 @@ export const playlistRouter = createTRPCRouter({
       });
 
       const playlist = await createPlaylist(account?.refresh_token ?? '', input.userSpotifyId, input.title, input.description)
+      console.log(playlist, 'BACKEND PLAYLIST')
+      return playlist
+    }),
+
+  addTracksToPlaylist: publicProcedure
+    .input(z.object({ userId: z.string(), playlistId: z.string(), trackList: z.string().array()}))
+    .mutation(async ({ ctx, input }) => {
+      if(!input.userId || !input.playlistId || !input.trackList) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input.userId
+        }
+      })
+
+      const playlist = await addTracksToUserPlaylist(account?.refresh_token ?? '', input.playlistId, input.trackList)
       return playlist
     }),
 
@@ -74,11 +89,26 @@ async function createPlaylist(refresh_token: string, userSpotifyId: string, titl
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: {title},
-      description: {description},
+      name: `${title}`,
+      description: `${description}`,
       public: false,
     }),
   })).json() as CreatedPlaylistData
+
+  return playlist
+}
+
+async function addTracksToUserPlaylist(refresh_token: string, playlistId: string, trackList: string[]) {
+  const { access_token } = await getAccessToken(refresh_token)
+
+  const playlist = await(await fetch(PLAYLIST_BY_ID_ENDPOINT(playlistId), {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${access_token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ uris: trackList })
+  })).json() as { snapshot_id: string }
 
   return playlist
 }

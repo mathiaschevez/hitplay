@@ -2,8 +2,7 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import { BsArrowLeftSquare } from 'react-icons/bs'
-import { BsArrowRightSquare } from 'react-icons/bs'
+import { BsArrowBarLeft, BsArrowBarRight } from 'react-icons/bs'
 import { MdOutlineCreate, MdOutlineMusicNote } from 'react-icons/md'
 import { IoPersonOutline } from 'react-icons/io5'
 import { GiMusicalNotes } from 'react-icons/gi'
@@ -57,8 +56,8 @@ function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
   return (
     <div className={`border-r ${sidebarOpen ? 'w-64' : 'w-16 items-center'} fixed flex flex-col p-3 h-full z-50 bg-[#0B132B]`}>
-      <button onClick={() => dispatch(setSideBarOpen(!sidebarOpen))} className={`${sidebarOpen ? 'justify-end' : 'mx-auto'} flex text-white mb-9 hover`}>
-        { sidebarOpen ? <BsArrowLeftSquare size={30} /> : <BsArrowRightSquare size={30} />}
+      <button onClick={() => dispatch(setSideBarOpen(!sidebarOpen))} className={`${sidebarOpen ? 'self-end' : 'self-center'} w-[30px] rounded-md p-1 text-white bg-white/10 hover:bg-white/20 mb-9`}>
+        { sidebarOpen ? <BsArrowBarLeft size={24} /> : <BsArrowBarRight size={24} />}
       </button>
       <SideBarItem title='Create' icon={<MdOutlineCreate size={24} />} sideBarOpen={sidebarOpen} />
       <SideBarItem title='Tracks' icon={<MdOutlineMusicNote size={24} />} sideBarOpen={sidebarOpen} />
@@ -71,7 +70,7 @@ function Sidebar({ sidebarOpen }: { sidebarOpen: boolean }) {
 
 function SideBarItem({ title, icon, sideBarOpen }: { title: string, icon: JSX.Element, sideBarOpen: boolean }) {
   return (
-    <Link href={`/${title.toLowerCase()}`} className={`${sideBarOpen ? 'py-2' : 'p-1'} mb-6 border-2 rounded-lg text-center font-bold text-white text-lg hover:bg-white hover:text-black`}>
+    <Link href={`/${title.toLowerCase()}`} className={`${sideBarOpen ? 'py-2' : 'p-1'} mb-6 rounded-lg text-center font-bold text-white text-lg bg-white/10 hover:bg-white/20`}>
       { sideBarOpen ? title : icon }
     </Link>
   )
