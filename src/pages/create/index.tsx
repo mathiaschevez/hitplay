@@ -3,12 +3,14 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import React from 'react'
 import { api } from '~/utils/api'
-import { Input } from 'antd'
-import { addSelectedTrack, clearSelectedTracks, removeSelectedTrack, selectSelectedTracks } from '~/store/reducers/creationSlice'
+import { Input, Tabs } from 'antd'
+import { addSelectedTrack, clearSelectedTracks, removeSelectedTrack, selectSelectedPlaylist, selectSelectedTracks, setSelectedPlaylist } from '~/store/reducers/creationSlice'
 import { useAppDispatch, useAppSelector } from '~/hooks'
-import { type Track } from '~/utils/types'
+import { type Playlist, type Track } from '~/utils/types'
 import { VscDiffAdded } from 'react-icons/vsc'
 import { AiFillCheckCircle } from 'react-icons/ai'
+import Image from 'next/image'
+import { IoMdArrowRoundBack } from 'react-icons/io'
 
 const Create = () => {
   const [activeSection, setActiveSection] = useState<'create' | 'add'>('create')
@@ -117,7 +119,58 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
 }
 
 const AddSection = () => {
+  const selectedPlaylist = useAppSelector(selectSelectedPlaylist)
+  const [activeTab, setActiveTab] = useState(selectedPlaylist ? '2' : '1')
+
+  const items = [
+    { key: '1', 
+      label: 'Item 1',
+      children: <PlaylistOptionsTab setActiveTab={setActiveTab}/> },
+    { key: '2',
+      label: 'Item 2',
+      children: <EditPlaylistTab setActiveTab={setActiveTab} selectedPlaylist={selectedPlaylist} /> },
+  ]
+
   return (
-    <div>Add</div>
+    <Tabs activeKey={activeTab} tabBarStyle={{ display: 'none' }} items={items} />
+  )
+}
+
+function PlaylistOptionsTab({ setActiveTab }: { setActiveTab: (_: string) => void }) {
+  const dispatch = useAppDispatch()
+  const { data: sessionData } = useSession()
+  const { data: usersPlaylists } = api.playlist.getUserPlaylists.useQuery(sessionData?.user.id ?? '')
+
+  function handleSelectPlaylist(playlist: Playlist) {
+    dispatch(setSelectedPlaylist(playlist))
+    setActiveTab('2')
+  }
+
+  return (
+    <div className='p-6'>
+      <h1 className='font-bold text-white text-3xl'>Select a playlist to add to:</h1>
+      <div className='grid grid-cols-4 gap-6'>
+        { usersPlaylists?.map((playlist) => (
+          <button onClick={() => handleSelectPlaylist(playlist)} key={playlist.id} className='bg-[#0B132B] border-2 border-white rounded-lg mt-6 p-3'>
+            {playlist.images[0] && <Image src={playlist.images[0].url} className='mb-3' alt={playlist.name} width={300} height={300} />}
+            <h1 className='font-bold text-white text-lg'>{playlist.name}</h1>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function EditPlaylistTab({ setActiveTab, selectedPlaylist }: { setActiveTab: (_: string) => void, selectedPlaylist: Playlist | null }) {
+  console.log(selectedPlaylist)
+  return (
+    !selectedPlaylist ? <div className='p-3 text-white'>Something went wrong please try again...</div> :
+      <div className='flex flex-col gap-6 p-6'>
+        <button className='w-28 rounded-lg p-1 flex items-center gap-3 text-xl font-bold bg-white/10 hover:bg-white/20' onClick={() => setActiveTab('1')}><IoMdArrowRoundBack size={30}/> Back</button>
+        <div className='flex gap-6'>
+          {selectedPlaylist.images[0]?.url && <Image src={selectedPlaylist.images[0].url} alt={selectedPlaylist.name} width={300} height={300} />}
+          <h1 className='text-white text-4xl font-bold'>{selectedPlaylist.name}</h1>
+        </div>
+      </div>
   )
 }
