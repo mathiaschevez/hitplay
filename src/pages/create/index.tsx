@@ -139,6 +139,7 @@ const AddSection = () => {
 function PlaylistOptionsTab({ setActiveTab }: { setActiveTab: (_: string) => void }) {
   const dispatch = useAppDispatch()
   const { data: sessionData } = useSession()
+  const { data: spotifyUser } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
   const { data: usersPlaylists } = api.playlist.getUserPlaylists.useQuery(sessionData?.user.id ?? '')
 
   function handleSelectPlaylist(playlist: Playlist) {
@@ -150,7 +151,7 @@ function PlaylistOptionsTab({ setActiveTab }: { setActiveTab: (_: string) => voi
     <div className='p-6'>
       <h1 className='font-bold text-white text-3xl'>Select a playlist to add to:</h1>
       <div className='grid grid-cols-4 gap-6'>
-        { usersPlaylists?.map((playlist) => (
+        { usersPlaylists?.filter(playlist => playlist.owner.id === spotifyUser?.id).map((playlist) => (
           <button onClick={() => handleSelectPlaylist(playlist)} key={playlist.id} className='bg-[#0B132B] border-2 border-white rounded-lg mt-6 p-3'>
             {playlist.images[0] && <Image src={playlist.images[0].url} className='mb-3' alt={playlist.name} width={300} height={300} />}
             <h1 className='font-bold text-white text-lg'>{playlist.name}</h1>

@@ -25,7 +25,10 @@ export type Playlist = {
     url: string,
     height: number,
     width: number,
-  }[] 
+  }[],
+  owner: {
+    id: string,
+  }
 }
 
 export type Artist = {
