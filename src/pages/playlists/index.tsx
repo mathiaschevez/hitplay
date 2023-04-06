@@ -18,11 +18,14 @@ const Playlists: NextPage = () => {
         <meta name='description' content='Find the best music for your playlists' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6'>
-        {playlists && playlists.map(p => (
-          <Playlist key={p.id} playlist={p} />
-        ))}
-      </div>
+      <main>
+        <h1 className='text-white font-bold text-5xl p-6 pb-0'>YOUR PLAYLISTS</h1>
+        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-6'>
+          {playlists && playlists.map(p => (
+            <Playlist key={p.id} playlist={p} />
+          ))}
+        </div>
+      </main>
     </>
   )
 }
@@ -33,13 +36,9 @@ export function Playlist({ playlist } : { playlist: Playlist }) {
   const playlistImage = playlist.images[0]
   
   return (
-    <Link 
-      href={`/playlists/${playlist.id}`} 
-      className='border p-3 rounded'
-      style={{ backgroundColor: 'rgba(171,119,248,.25)' }}
-    >
+    <Link href={`/playlists/${playlist.id}`} className='p-3 bg-[#0B132B] shadow-lg rounded-2xl'>
       {playlistImage && <Image alt={playlist.name} src={playlistImage.url} width={300} height={300} />}
-      <h1 className='text-white text-lg mt-3'>{playlist.name}</h1>
+      <h1 className='text-white text-lg mt-3 font-bold'>{playlist.name}</h1>
     </Link>
   )
 }
