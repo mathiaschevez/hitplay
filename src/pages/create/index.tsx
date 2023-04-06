@@ -93,9 +93,9 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
       <Input value={description} onChange={(e) => setDescription(e.target.value)} className='bg-[#0B132B] border-2 border-white text-lg font-bold mt-6' placeholder='Description' />
       <Input className='border-2 border-white bg-[#0B132B] text-lg font-bold mt-6' placeholder='Search for tracks' />
       <div className='flex w-full justify-between gap-12'>
-        <div className='bg-[#0B132B] flex flex-col mt-6 border-2 rounded-lg overflow-y-scroll max-h-[400px] w-[50%]'>
+        <div className='flex flex-col mt-6 overflow-y-scroll max-h-[400px] w-[50%] gap-3 pr-3'>
           { userTopTracks?.items.map((track) => (
-            <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
+            <div key={track.id} className='bg-[#0B132B] rounded-lg text-white shadow-lg px-3 py-2 flex justify-between'>
               <div>{track.name}</div>
               { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ? 
                 <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
@@ -164,13 +164,27 @@ function PlaylistOptionsTab({ setActiveTab }: { setActiveTab: (_: string) => voi
 
 function EditPlaylistTab({ setActiveTab, selectedPlaylist }: { setActiveTab: (_: string) => void, selectedPlaylist: Playlist | null }) {
   console.log(selectedPlaylist)
+  const { data: sessionData } = useSession()
+  const { data: spotifyPlaylist } = api.playlist.getPlaylistById.useQuery({ userId: sessionData?.user.id ?? '', playlistId: selectedPlaylist?.id ?? '' })
+
   return (
     !selectedPlaylist ? <div className='p-3 text-white'>Something went wrong please try again...</div> :
       <div className='flex flex-col gap-6 p-6'>
         <button className='w-28 rounded-lg p-1 flex items-center gap-3 text-xl font-bold bg-white/10 hover:bg-white/20' onClick={() => setActiveTab('1')}><IoMdArrowRoundBack size={30}/> Back</button>
         <div className='flex gap-6'>
           {selectedPlaylist.images[0]?.url && <Image src={selectedPlaylist.images[0].url} alt={selectedPlaylist.name} width={300} height={300} />}
-          <h1 className='text-white text-4xl font-bold'>{selectedPlaylist.name}</h1>
+          <div className='flex flex-col gap-3'>
+            <h1 className='text-white text-4xl font-bold'>{selectedPlaylist.name}</h1>
+            <h1 className='font-bold text-lg'>{selectedPlaylist.tracks.total} Total Tracks</h1>
+          </div>
+        </div>
+        <div className='flex flex-col gap-3'>
+          {spotifyPlaylist?.items.map((track, i) => (
+            <div className='flex gap-3 items-center bg-[#0B132B] shadow-lg rounded-lg p-3' key={track.track.name}>
+              {track.track.album.images[0] && <Image src={track.track.album.images[0].url} alt={track.track.name} width={50} height={50} />}
+              <h1 className='font-bold'>{i + 1}. {track.track.name}</h1>
+            </div>
+          ))}
         </div>
       </div>
   )

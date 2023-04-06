@@ -1,14 +1,18 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc"; // protectedProcedure,
 import { getAccessToken } from "~/utils/api";
-import { type Playlist } from "~/utils/types";
+import { type Playlist, type PlaylistTrack } from "~/utils/types";
 
 const PLAYLISTS_ENDPOINT = 'https://api.spotify.com/v1/me/playlists';
 const CREATE_PLAYLIST_ENDPOINT = (user_id: string) => `https://api.spotify.com/v1/users/${user_id}/playlists`;
 const PLAYLIST_BY_ID_ENDPOINT = (playlist_id: string) => `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`;
 
-interface PlaylistsData {
+interface PlaylistsList{
   items: Playlist[]
+}
+
+interface UserPlaylist {
+  items: PlaylistTrack[]
 }
 
 interface CreatedPlaylistData {
@@ -120,7 +124,7 @@ async function getUsersPlaylists(refresh_token: string) {
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
-  })).json() as PlaylistsData
+  })).json() as PlaylistsList
 
   return userPlaylists
 }
@@ -132,7 +136,7 @@ async function getPlaylistById(refresh_token: string, playlistId: string) {
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
-  })).json() as PlaylistsData
+  })).json() as UserPlaylist
 
   return playlist
 }

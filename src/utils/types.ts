@@ -29,6 +29,9 @@ export type Playlist = {
   owner: {
     id: string,
   }
+  tracks: {
+    total: number
+  }
 }
 
 export type Artist = {
