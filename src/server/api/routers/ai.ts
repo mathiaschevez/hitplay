@@ -29,3 +29,5 @@ export const aiRouter = createTRPCRouter({
       }
     })
 });
+
+// Provide a list of songs that are similar to the following: Runaway, Moonlight, Goodnews, in the form of an array of objects with the song title and artist name as properties

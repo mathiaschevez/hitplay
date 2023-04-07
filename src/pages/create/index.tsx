@@ -123,19 +123,18 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
           ))}
         </div>
       </div>
-      <div className='flex flex-col w-1/2'>
-        <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
-        <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
-          { userTopTracks?.items.map((track) => (
-            <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
-              <div>{track.name}</div>
-              { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ? 
-                <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
-                <button onClick={() => dispatch(addSelectedTrack(track))}><VscDiffAdded size={27} /></button>
-              }
-            </div>
-          ))}
-        </div>
+      <AiRecommendations />
+    </div>
+  )
+}
+
+const AiRecommendations = () => {
+
+  return (
+    <div className='flex flex-col w-1/2'>
+      <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
+      <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
+        here
       </div>
     </div>
   )
