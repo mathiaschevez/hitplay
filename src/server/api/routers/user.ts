@@ -4,7 +4,7 @@ import { type Artist, type Track } from "~/utils/types";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const USER_ENDPOINT = 'https://api.spotify.com/v1/me'
-const USER_TOP_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/top/tracks'
+const USER_TOP_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term'
 const USER_TOP_ARTISTS_ENDPOINT = 'https://api.spotify.com/v1/me/top/artists'
 
 interface UserData {

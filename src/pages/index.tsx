@@ -10,17 +10,11 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main>
-        <Main />
+        <div>Main</div>
       </main>
     </>
   );
 };
 
 export default Home;
-
-function Main() {
-  return (
-    <div>Main</div>
-  )
-}
 

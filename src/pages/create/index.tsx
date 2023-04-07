@@ -11,10 +11,10 @@ import { VscDiffAdded } from 'react-icons/vsc'
 import { AiFillCheckCircle } from 'react-icons/ai'
 import Image from 'next/image'
 import { IoMdArrowRoundBack } from 'react-icons/io'
+import { useDispatch } from 'react-redux'
 
 const Create = () => {
   const [activeSection, setActiveSection] = useState<'create' | 'add'>('create')
-  const selectedTracks = useAppSelector(selectSelectedTracks)
 
   return (
     <>
@@ -34,9 +34,8 @@ const Create = () => {
               Add to an existing playlist
             </button>
           </div>
-          { activeSection === 'create' ? <CreateSection selectedTracks={selectedTracks} /> : <AddSection /> }
+          { activeSection === 'create' ? <CreateSection /> : <AddSection /> }
         </div>
-        {/* <HelperAi selectedTracks={selectedTracks} /> */}
       </main>
     </>
   )
@@ -44,24 +43,17 @@ const Create = () => {
 
 export default Create
 
-// const HelperAi = ({ selectedTracks }: { selectedTracks: Track[] }) => {
-//   return (
-//     <div className='w-[30%] border-l p-6'>
-//       <h1 className='text-white font-bold text-3xl'>Helper AI</h1>
-//     </div>
-//   )
-// }
-
-const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
+const CreateSection = () => {
   const dispatch = useAppDispatch()
+  const selectedTracks = useAppSelector(selectSelectedTracks)
   const { data: sessionData } = useSession()
   const { data: spotifyUser } = api.user.getCurrentUser.useQuery(sessionData?.user.id ?? '')
-  const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
   const playlistCreation = api.playlist.createPlaylist.useMutation()
   const addTracksToPlaylist = api.playlist.addTracksToPlaylist.useMutation()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [activeTab, setActiveTab] = useState<string>('1')
 
   const handlePlaylistCreation = async () => {
     if (!sessionData || !spotifyUser) return
@@ -87,15 +79,41 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
     setDescription('')
   }
 
+  const items = [
+    { key: '1', 
+      label: 'Recommended Tracks', 
+      children: <CreateSectionRecommendedTracksTab selectedTracks={selectedTracks} /> },
+    { key: '2',
+    label: 'Search',
+    children: <CreateSectionSearchTab /> },
+    { key: '3', 
+      label: 'Selected Tracks',
+      disabled: selectedTracks.length === 0,
+      children: <CreateSectionSelectedTracksTab selectedTracks={selectedTracks} /> },
+  ]
+
   return (
-    <div className='p-6'>
-      <Input value={title} onChange={(e) => setTitle(e.target.value)} className='bg-[#0B132B] border-2 border-white text-lg font-bold' placeholder='Title' />
-      <Input value={description} onChange={(e) => setDescription(e.target.value)} className='bg-[#0B132B] border-2 border-white text-lg font-bold mt-6' placeholder='Description' />
-      <Input className='border-2 border-white bg-[#0B132B] text-lg font-bold mt-6' placeholder='Search for tracks' />
-      <div className='flex w-full justify-between gap-12'>
-        <div className='flex flex-col mt-6 overflow-y-scroll max-h-[400px] w-[50%] gap-3 pr-3'>
+    <div className='flex flex-col p-6'>
+      <Input value={title} onChange={(e) => setTitle(e.target.value)} className='bg-[#0B132B] border-2 w-1/2 border-white font-bold' placeholder='Title' />
+      <Input value={description} onChange={(e) => setDescription(e.target.value)} className='bg-[#0B132B] w-1/2 border-2 border-white font-bold mt-6' placeholder='Description' />
+      <Tabs className='mt-3' onChange={setActiveTab} activeKey={activeTab} items={items} />
+      <button disabled={!title} onClick={() => void handlePlaylistCreation()} className={`${!title ? 'cursor-not-allowed' : 'hover:bg-white/30'} rounded-lg w-full bg-white/20 text-white py-3 px-2 text-lg font-bold mt-3`}>Create</button>
+    </div>
+  )
+}
+
+const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks: Track[]}) => {
+  const dispatch = useDispatch()
+  const { data: sessionData } = useSession()
+  const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
+
+  return (
+    <div className='flex gap-3'>
+      <div className='flex flex-col w-1/2'>
+        <h1 className='font-bold text-xl mb-3'>Your Top Tracks</h1>
+        <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
           { userTopTracks?.items.map((track) => (
-            <div key={track.id} className='bg-[#0B132B] rounded-lg text-white shadow-lg px-3 py-2 flex justify-between'>
+            <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
               <div>{track.name}</div>
               { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ? 
                 <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
@@ -104,16 +122,44 @@ const CreateSection = ({ selectedTracks }: { selectedTracks: Track[] }) => {
             </div>
           ))}
         </div>
-        <div className='border-2 rounded-lg bg-[#0B132B] mt-6 overflow-y-scroll max-h-[400px] w-[50%]'>
-          <h1 className='px-3 py-2 text-white border-b font-bold text-lg'>Songs in Playlist</h1>
-          { selectedTracks.map((track) => (
+      </div>
+      <div className='flex flex-col w-1/2'>
+        <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
+        <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
+          { userTopTracks?.items.map((track) => (
             <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
               <div>{track.name}</div>
-            </div>  
+              { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ? 
+                <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
+                <button onClick={() => dispatch(addSelectedTrack(track))}><VscDiffAdded size={27} /></button>
+              }
+            </div>
           ))}
         </div>
       </div>
-      <button disabled={!title} onClick={() => void handlePlaylistCreation()} className='border-2 rounded-lg w-full text-white py-3 px-2 text-lg font-bold mt-3'>Create</button>
+    </div>
+  )
+}
+
+const CreateSectionSearchTab = () => {
+  return (
+    <div className='flex flex-col gap-3'>
+      <Input className='bg-[#0B132B] border-2 border-white font-bold' placeholder='Search' />
+      <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
+      </div>
+    </div>
+  )
+}
+
+const CreateSectionSelectedTracksTab = ({ selectedTracks }: { selectedTracks: Track[] }) => {
+  return (
+    <div className='border-2 rounded-lg bg-[#0B132B] overflow-y-scroll max-h-[400px] w-[50%]'>
+      <h1 className='px-3 py-2 text-white border-b font-bold text-lg'>Songs in Playlist</h1>
+      { selectedTracks.map((track) => (
+        <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
+          <div>{track.name}</div>
+        </div>  
+      ))}
     </div>
   )
 }
@@ -163,7 +209,6 @@ function PlaylistOptionsTab({ setActiveTab }: { setActiveTab: (_: string) => voi
 }
 
 function EditPlaylistTab({ setActiveTab, selectedPlaylist }: { setActiveTab: (_: string) => void, selectedPlaylist: Playlist | null }) {
-  console.log(selectedPlaylist)
   const { data: sessionData } = useSession()
   const { data: spotifyPlaylist } = api.playlist.getPlaylistById.useQuery({ userId: sessionData?.user.id ?? '', playlistId: selectedPlaylist?.id ?? '' })
 

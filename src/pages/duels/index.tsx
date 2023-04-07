@@ -17,11 +17,9 @@ interface TrackFromDb {
 }
 
 const Duels: NextPage = () => {
-  // const [impactText, setImpactText] = useState<string | null>(null)
   const duelCreation = api.duel.createDuel.useMutation()
   const { data: sessionData } = useSession()
   const { data: tracksInDb, refetch: refetchTracksFromDb } = api.track.getTracksFromDb.useQuery()
-  // const { data: trackImpact, refetch: refetchTrackImpact } = api.impact.getTrackImpact.useQuery({ text: impactText })
 
   const [currentTracks, setCurrentTracks] = useState<[TrackFromDb | null, TrackFromDb | null]>()
  
@@ -62,12 +60,6 @@ const Duels: NextPage = () => {
     tracksInDb && getTwoRandomTracks(tracksInDb)
   }
 
-  // const handleGetTrackImpact = async (text: string) => {
-  //   setImpactText(text)
-  //   const response = await refetchTrackImpact()
-  //   console.log(response, 'RESPONSE HERE')
-  // }
-
   return (
     <>
       <Head>
@@ -77,8 +69,6 @@ const Duels: NextPage = () => {
       </Head>
       <main className='flex flex-col items-center justify-center p-10 w-full flex-1'>
         <h1 className='text-white font-bold text-5xl mb-6'>DUELS</h1>
-        {/* <h1 className='text-white font-bold text-5xl'>{trackImpact}</h1> */}
-        {/* <button onClick={() => void handleGetTrackImpact('What is the difference between 500 and 1000')}>BUTTON</button> */}
         <div className='flex flex-col xl:flex-row gap-10 xl:gap-0 justify-around w-full flex-1 items-center'>
           { tracksInDb && currentTracks ?
             <>

@@ -7,7 +7,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export const impactRouter = createTRPCRouter({
+export const aiRouter = createTRPCRouter({
   getTrackImpact: publicProcedure
     .input(z.object({ text: z.string().nullable() }))
     .query( async ({ input }) => {
