@@ -129,12 +129,16 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
 }
 
 const AiRecommendations = () => {
+  // const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery(['Runaway, Goodnews, Moonlight'])
+  // console.log(aiRecommendations, 'AI RECOMMENDATIONS')
 
   return (
     <div className='flex flex-col w-1/2'>
       <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
       <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
-        here
+        {/* { aiRecommendations?.map((track) => (
+          <div key={track.title}>{track.title}</div>
+        ))} */}
       </div>
     </div>
   )
