@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Configuration, OpenAIApi } from "openai";
-import { selectAiRecommendedTracks } from "~/store/reducers/aiSlice";
-import { store } from "~/store/store";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,

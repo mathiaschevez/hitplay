@@ -12,7 +12,7 @@ import { AiFillCheckCircle } from 'react-icons/ai'
 import Image from 'next/image'
 import { IoMdArrowRoundBack } from 'react-icons/io'
 import { useDispatch } from 'react-redux'
-import { selectAiRecommendedTracks, setAiRecommendedTracks } from '~/store/reducers/aiSlice'
+import { removeAiRecommendedTracks, selectAiRecommendedTracks, setAiRecommendedTracks } from '~/store/reducers/aiSlice'
 
 const Create = () => {
   const [activeSection, setActiveSection] = useState<'create' | 'add'>('create')
@@ -108,6 +108,11 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
   const { data: sessionData } = useSession()
   const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
 
+  const handleAddTrack = (track: Track) => {
+    dispatch(removeAiRecommendedTracks())
+    dispatch(addSelectedTrack(track))
+  }
+
   return (
     <div className='flex gap-3'>
       <div className='flex flex-col w-1/2'>
@@ -118,7 +123,7 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
               <div>{track.name}</div>
               { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ?
                 <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
-                <button onClick={() => dispatch(addSelectedTrack(track))}><VscDiffAdded size={27} /></button>
+                <button onClick={() => handleAddTrack(track)}><VscDiffAdded size={27} /></button>
               }
             </div>
           ))}

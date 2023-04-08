@@ -19,11 +19,14 @@ export const aiSlice = createSlice({
     setAiRecommendedTracks: (state, action: PayloadAction<{ title: string, artist: string }[]>) => {
       console.log(action.payload, 'HERE IS THE PAYLOAD ACTION')
       state.recommendedTracks = action.payload
+    },
+    removeAiRecommendedTracks: (state) => {
+      state.recommendedTracks = []
     }
   }
 })
 
-export const { setAiRecommendedTracks } = aiSlice.actions
+export const { setAiRecommendedTracks, removeAiRecommendedTracks } = aiSlice.actions
 
 export const selectAiRecommendedTracks = (state: RootState) => state.ai.recommendedTracks
 
