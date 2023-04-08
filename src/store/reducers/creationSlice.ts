@@ -17,7 +17,6 @@ const initialState: CreationState = {
 
 export const creationSlice = createSlice({
   name: 'creation',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
     addSelectedTrack: (state, action: PayloadAction<Track>) => {

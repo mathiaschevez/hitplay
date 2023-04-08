@@ -14,18 +14,18 @@ const initialState: NavigationState = {
 
 export const aiSlice = createSlice({
   name: 'ai',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    setRecommendedTracks: (state, action: PayloadAction<{ title: string, artist: string }[]>) => {
+    setAiRecommendedTracks: (state, action: PayloadAction<{ title: string, artist: string }[]>) => {
+      console.log(action.payload, 'HERE IS THE PAYLOAD ACTION')
       state.recommendedTracks = action.payload
     }
   }
 })
 
-export const { setRecommendedTracks } = aiSlice.actions
+export const { setAiRecommendedTracks } = aiSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectedRecommendedTracks = (state: RootState) => state.ai.recommendedTracks
+export const selectAiRecommendedTracks = (state: RootState) => state.ai.recommendedTracks
 
 export default aiSlice.reducer

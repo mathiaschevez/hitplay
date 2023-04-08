@@ -12,6 +12,7 @@ import { AiFillCheckCircle } from 'react-icons/ai'
 import Image from 'next/image'
 import { IoMdArrowRoundBack } from 'react-icons/io'
 import { useDispatch } from 'react-redux'
+import { selectAiRecommendedTracks, setAiRecommendedTracks } from '~/store/reducers/aiSlice'
 
 const Create = () => {
   const [activeSection, setActiveSection] = useState<'create' | 'add'>('create')
@@ -115,7 +116,7 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
           { userTopTracks?.items.map((track) => (
             <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
               <div>{track.name}</div>
-              { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ? 
+              { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ?
                 <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
                 <button onClick={() => dispatch(addSelectedTrack(track))}><VscDiffAdded size={27} /></button>
               }
@@ -129,16 +130,23 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
 }
 
 const AiRecommendations = () => {
-  // const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery(['Runaway, Goodnews, Moonlight'])
-  // console.log(aiRecommendations, 'AI RECOMMENDATIONS')
+  const dispatch = useAppDispatch()
+  const aiRecommendedTracks = useAppSelector(selectAiRecommendedTracks)
+  const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery(['Runaway, Goodnews, Moonlight'])
+  console.log(aiRecommendations, 'AI RECOMMENDATIONS')
+  console.log(aiRecommendedTracks, 'AI RECOMMENDED TRACKS')
+
+  if(aiRecommendations && aiRecommendations.length > 0 && aiRecommendedTracks.length === 0) {
+    dispatch(setAiRecommendedTracks(aiRecommendations))
+  }
 
   return (
     <div className='flex flex-col w-1/2'>
       <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
       <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
-        {/* { aiRecommendations?.map((track) => (
+        { aiRecommendations?.map((track) => (
           <div key={track.title}>{track.title}</div>
-        ))} */}
+        ))}
       </div>
     </div>
   )
