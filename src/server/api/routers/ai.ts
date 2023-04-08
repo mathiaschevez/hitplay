@@ -16,17 +16,16 @@ interface RecommendedTrack {
 
 export const aiRouter = createTRPCRouter({
   getAiRecommendedTracks: publicProcedure
-    .input(z.string().array())
+    .input(z.object({ selectedTracks: z.string().array(), tracksInStore: z.boolean() }))
     .query(async ({ input }) => {
-      const tracksInStore = selectAiRecommendedTracks(store.getState())
-      if(input.length === 0 || tracksInStore.length > 0) return tracksInStore
+      if(input.selectedTracks.length === 0 || input.tracksInStore) return
 
       try {
         const completion = await openai.createChatCompletion({
           model: 'gpt-3.5-turbo',
           messages: [
             {'role': 'system', 'content': 'You should only reply with code and no other additional text in your response.'},
-            {'role': 'user', 'content': `Provide a list of 2 songs that are similar to the following: ${input.map((trackName) => trackName).join(', ')}, in the form of an array of json objects with the song title and artist name as properties`}
+            {'role': 'user', 'content': `Provide a list of 2 songs that are similar to the following: ${input.selectedTracks.map((trackName) => trackName).join(', ')}, in the form of an array of json objects with the song title and artist name as properties`}
           ],
           temperature: 0.6,
           max_tokens: 75,

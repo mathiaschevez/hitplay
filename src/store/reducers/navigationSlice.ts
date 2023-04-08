@@ -1,8 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import { type RootState } from '../store'
 
-
-// Define a type for the slice state
 interface NavigationState {
   sidebarOpen: boolean
 }
@@ -25,7 +23,6 @@ export const navigationSlice = createSlice({
 
 export const { setSideBarOpen } = navigationSlice.actions
 
-// Other code such as selectors can use the imported `RootState` type
 export const selectSideBarOpen = (state: RootState) => state.navigation.sidebarOpen
 
 export default navigationSlice.reducer

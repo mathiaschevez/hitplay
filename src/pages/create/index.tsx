@@ -112,7 +112,7 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
     <div className='flex gap-3'>
       <div className='flex flex-col w-1/2'>
         <h1 className='font-bold text-xl mb-3'>Your Top Tracks</h1>
-        <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
+        <div className='flex flex-col overflow-y-scroll h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
           { userTopTracks?.items.map((track) => (
             <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
               <div>{track.name}</div>
@@ -131,10 +131,12 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
 
 const AiRecommendations = () => {
   const dispatch = useAppDispatch()
+  const selectedTracks = useAppSelector(selectSelectedTracks)
   const aiRecommendedTracks = useAppSelector(selectAiRecommendedTracks)
-  const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery(['Runaway, Goodnews, Moonlight'])
-  console.log(aiRecommendations, 'AI RECOMMENDATIONS')
-  console.log(aiRecommendedTracks, 'AI RECOMMENDED TRACKS')
+  const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery({ 
+    selectedTracks: selectedTracks.map(track => track.name), 
+    tracksInStore: aiRecommendedTracks.length > 0 
+  })
 
   if(aiRecommendations && aiRecommendations.length > 0 && aiRecommendedTracks.length === 0) {
     dispatch(setAiRecommendedTracks(aiRecommendations))
@@ -143,10 +145,14 @@ const AiRecommendations = () => {
   return (
     <div className='flex flex-col w-1/2'>
       <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
-      <div className='flex flex-col overflow-y-scroll max-h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
-        { aiRecommendations?.map((track) => (
-          <div key={track.title}>{track.title}</div>
-        ))}
+      <div className='flex flex-col overflow-y-scroll h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
+        { selectedTracks.length === 0 ? <div className='text-white px-3 py-2 w-full text-center my-auto text-lg'>Select some tracks to get recommendations</div> :
+          <>
+            { aiRecommendedTracks?.map((track) => (
+              <div key={track.title}>{track.title}</div>
+            ))}
+          </>
+        }
       </div>
     </div>
   )

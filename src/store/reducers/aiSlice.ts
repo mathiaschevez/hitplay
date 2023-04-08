@@ -25,7 +25,6 @@ export const aiSlice = createSlice({
 
 export const { setAiRecommendedTracks } = aiSlice.actions
 
-// Other code such as selectors can use the imported `RootState` type
 export const selectAiRecommendedTracks = (state: RootState) => state.ai.recommendedTracks
 
 export default aiSlice.reducer
