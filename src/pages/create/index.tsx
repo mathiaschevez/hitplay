@@ -144,14 +144,13 @@ const CreateSectionRecommendedTracksTab = ({ setTitle, selectedTracks }: { setTi
           ))}
         </div>
       </div>
-      <AiRecommendations />
+      <AiRecommendations selectedTracks={selectedTracks} />
     </div>
   )
 }
 
-const AiRecommendations = () => {
+const AiRecommendations = ({ selectedTracks }: { selectedTracks: Track[]}) => {
   const dispatch = useAppDispatch()
-  const selectedTracks = useAppSelector(selectSelectedTracks)
   const aiRecommendedTracksInStore = useAppSelector(selectAiRecommendedTracks)
   const { data: sessionData } = useSession()
   const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery({
@@ -161,7 +160,6 @@ const AiRecommendations = () => {
   }, { enabled: selectedTracks.length > 0 })
 
   if(aiRecommendations && aiRecommendations.length > 0 && aiRecommendedTracksInStore.length === 0) {
-    console.log(aiRecommendations, 'aiRecommendations')
     dispatch(setAiRecommendedTracks(aiRecommendations))
   }
 
