@@ -19,6 +19,9 @@ export const creationSlice = createSlice({
     addSelectedTrack: (state, action: PayloadAction<Track>) => {
       state.selectedTracks.push(action.payload)
     },
+    addMultipleTracks(state, action: PayloadAction<Track[]>) {
+      state.selectedTracks = [...state.selectedTracks, ...action.payload]
+    },
     removeSelectedTrack: (state, action: PayloadAction<{trackId: string}>) => {
       state.selectedTracks = state.selectedTracks.filter(track => track.id !== action.payload.trackId)
     },
@@ -34,7 +37,10 @@ export const creationSlice = createSlice({
   }
 })
 
-export const { addSelectedTrack, removeSelectedTrack, clearSelectedTracks, setSelectedPlaylist, clearSelectedPlaylist } = creationSlice.actions
+export const { 
+  addSelectedTrack, removeSelectedTrack, clearSelectedTracks, 
+  setSelectedPlaylist, clearSelectedPlaylist, addMultipleTracks
+} = creationSlice.actions
 
 export const selectSelectedTracks = (state: RootState) => state.creation.selectedTracks
 export const selectSelectedPlaylist = (state: RootState) => state.creation.selectedPlaylist

@@ -1,10 +1,12 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import { type RootState } from '../store'
+import { type Track } from '~/utils/types'
+
 
 
 // Define a type for the slice state
 interface NavigationState {
-  recommendedTracks: { title: string, artist: string }[]
+  recommendedTracks: Track[]
 }
 
 // Define the initial state using that type
@@ -16,8 +18,7 @@ export const aiSlice = createSlice({
   name: 'ai',
   initialState,
   reducers: {
-    setAiRecommendedTracks: (state, action: PayloadAction<{ title: string, artist: string }[]>) => {
-      console.log(action.payload, 'HERE IS THE PAYLOAD ACTION')
+    setAiRecommendedTracks: (state, action: PayloadAction<Track[]>) => {
       state.recommendedTracks = action.payload
     },
     removeAiRecommendedTracks: (state) => {

@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Configuration, OpenAIApi } from "openai";
+import { type Track } from "~/utils/types";
+import { getAccessToken } from "~/utils/api";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,9 +16,15 @@ interface RecommendedTrack {
 
 export const aiRouter = createTRPCRouter({
   getAiRecommendedTracks: publicProcedure
-    .input(z.object({ selectedTracks: z.string().array(), tracksInStore: z.boolean() }))
-    .query(async ({ input }) => {
-      if(input.selectedTracks.length === 0 || input.tracksInStore) return
+    .input(z.object({ userId: z.string(), selectedTracks: z.string().array(), tracksInStore: z.boolean() }))
+    .query(async ({ ctx, input }) => {
+      if(!input.userId || input.selectedTracks.length === 0 || input.tracksInStore) return []
+      
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input.userId
+        }
+      });
 
       try {
         const completion = await openai.createChatCompletion({
@@ -33,7 +41,14 @@ export const aiRouter = createTRPCRouter({
         if(!content) return []
 
         const recommendedTracks = content.slice(content.indexOf('['), content.lastIndexOf(']') + 1)
-        return JSON.parse(recommendedTracks) as RecommendedTrack[]
+        const tracks = JSON.parse(recommendedTracks) as RecommendedTrack[]
+        
+        const spotifyTracks = await Promise.all(tracks.map(async (track) => {
+          return await findTrack(account?.refresh_token ?? '', track)
+        }))
+
+        console.log(spotifyTracks, 'SPOTIFY TRACKS ++++++++++++++++++')
+        return spotifyTracks as Track[]
       } catch (error) {
         console.log(error, 'ERROR ++++++++++++++++++')
       }
@@ -58,5 +73,32 @@ export const aiRouter = createTRPCRouter({
       } catch (error) {
         console.log(error)
       }
+    }),
+
+  findRecommendedTracks: publicProcedure
+    .input(z.object({ userId: z.string(), track: z.object({ title: z.string(), artist: z.string() }) }))
+    .query(async ({ ctx, input }) => {
+      if(!input) return null
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: input.userId
+        }
+      });
+
+      const tracks = await findTrack(account?.refresh_token ?? '', input.track)
+      return tracks ?? []
     })
 });
+
+async function findTrack(refresh_token: string, track: { title: string, artist: string }) {
+  const { access_token } = await getAccessToken(refresh_token)
+  const query = `${track.title} ${track.artist}`
+
+  const tracks = await(await fetch(`https://api.spotify.com/v1/search?q=${query}&type=track`, {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  })).json() as { tracks: { items: Track[] }}
+
+  return tracks.tracks.items[0]
+}

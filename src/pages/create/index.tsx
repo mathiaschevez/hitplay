@@ -4,7 +4,7 @@ import Head from 'next/head'
 import React from 'react'
 import { api } from '~/utils/api'
 import { Input, Tabs } from 'antd'
-import { addSelectedTrack, clearSelectedTracks, removeSelectedTrack, selectSelectedPlaylist, selectSelectedTracks, setSelectedPlaylist } from '~/store/reducers/creationSlice'
+import { addMultipleTracks, addSelectedTrack, clearSelectedTracks, removeSelectedTrack, selectSelectedPlaylist, selectSelectedTracks, setSelectedPlaylist } from '~/store/reducers/creationSlice'
 import { useAppDispatch, useAppSelector } from '~/hooks'
 import { type Playlist, type Track } from '~/utils/types'
 import { VscDiffAdded } from 'react-icons/vsc'
@@ -66,13 +66,11 @@ const CreateSection = () => {
     })
 
     if(playlist?.id && selectedTracks.length > 0) {
-      const playlistWithTracks = await addTracksToPlaylist.mutateAsync({
+      await addTracksToPlaylist.mutateAsync({
         userId: sessionData.user.id,
         playlistId: playlist?.id,
         trackList: selectedTracks.map(track => track.uri)
       })
-
-      console.log(playlistWithTracks, 'PLAYLIST WITH TRACKS')
     }
 
     dispatch(clearSelectedTracks())
@@ -83,7 +81,7 @@ const CreateSection = () => {
   const items = [
     { key: '1', 
       label: 'Recommended Tracks', 
-      children: <CreateSectionRecommendedTracksTab selectedTracks={selectedTracks} /> },
+      children: <CreateSectionRecommendedTracksTab setTitle={setTitle} selectedTracks={selectedTracks} /> },
     { key: '2',
     label: 'Search',
     children: <CreateSectionSearchTab /> },
@@ -103,7 +101,7 @@ const CreateSection = () => {
   )
 }
 
-const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks: Track[]}) => {
+const CreateSectionRecommendedTracksTab = ({ setTitle, selectedTracks }: { setTitle: (_: string) => void, selectedTracks: Track[]}) => {
   const dispatch = useDispatch()
   const { data: sessionData } = useSession()
   const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
@@ -113,14 +111,31 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
     dispatch(addSelectedTrack(track))
   }
 
+  const handleAddAll = () => {
+    setTitle('My Top 20 Tracks This Month')
+    dispatch(addMultipleTracks(userTopTracks?.items ?? []))
+  }
+  
   return (
-    <div className='flex gap-3'>
+    <div className='flex gap-24'>
       <div className='flex flex-col w-1/2'>
-        <h1 className='font-bold text-xl mb-3'>Your Top Tracks</h1>
+        <div className='flex w-full justify-between pb-3'>
+          <h1 className='font-bold text-xl mb-3'>Your Top Tracks</h1>
+          <button
+            disabled={userTopTracks?.items.length === 0}
+            onClick={() => handleAddAll()} 
+            className='hover:bg-[#0B132B] px-6 font-semibold py-1 rounded-full'
+          >
+            Add All
+          </button>
+        </div>
         <div className='flex flex-col overflow-y-scroll h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
           { userTopTracks?.items.map((track) => (
             <div key={track.id} className='text-white border-b px-3 py-2 flex justify-between'>
-              <div>{track.name}</div>
+              <div className='flex gap-3 items-center'>
+                <Image alt={track.name} src={track.album.images[0]?.url ?? ''} width={33} height={33} />
+                <h1 className='font-semibold'>{track.name}</h1>
+              </div>
               { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ?
                 <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
                 <button onClick={() => handleAddTrack(track)}><VscDiffAdded size={27} /></button>
@@ -137,13 +152,16 @@ const CreateSectionRecommendedTracksTab = ({ selectedTracks }: { selectedTracks:
 const AiRecommendations = () => {
   const dispatch = useAppDispatch()
   const selectedTracks = useAppSelector(selectSelectedTracks)
-  const aiRecommendedTracks = useAppSelector(selectAiRecommendedTracks)
-  const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery({ 
-    selectedTracks: selectedTracks.map(track => track.name), 
-    tracksInStore: aiRecommendedTracks.length > 0 
-  })
+  const aiRecommendedTracksInStore = useAppSelector(selectAiRecommendedTracks)
+  const { data: sessionData } = useSession()
+  const { data: aiRecommendations } = api.ai.getAiRecommendedTracks.useQuery({
+    userId: sessionData?.user.id ?? '',
+    selectedTracks: selectedTracks.map(track => track.name),
+    tracksInStore: aiRecommendedTracksInStore.length > 0
+  }, { enabled: selectedTracks.length > 0 })
 
-  if(aiRecommendations && aiRecommendations.length > 0 && aiRecommendedTracks.length === 0) {
+  if(aiRecommendations && aiRecommendations.length > 0 && aiRecommendedTracksInStore.length === 0) {
+    console.log(aiRecommendations, 'aiRecommendations')
     dispatch(setAiRecommendedTracks(aiRecommendations))
   }
 
@@ -153,8 +171,8 @@ const AiRecommendations = () => {
       <div className='flex flex-col overflow-y-scroll h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
         { selectedTracks.length === 0 ? <div className='text-white px-3 py-2 w-full text-center my-auto text-lg'>Select some tracks to get recommendations</div> :
           <>
-            { aiRecommendedTracks?.map((track) => (
-              <div key={track.title}>{track.title}</div>
+            { aiRecommendedTracksInStore?.map((track) => (
+              <div key={track.name}>{track.name}</div>
             ))}
           </>
         }

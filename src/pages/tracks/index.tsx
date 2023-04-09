@@ -18,7 +18,9 @@ const Tracks: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main>
-        <h1 className='text-white font-bold text-5xl p-6 pb-0'>YOUR TOP TRACKS</h1>
+        <div>
+          <h1 className='text-white font-bold text-4xl p-6 pb-0'>YOUR TOP TRACKS</h1>
+        </div>
         <div className='grid grid-cols-4 gap-6 p-6'>
           {topTracks?.items.map((track, i: number) => (
             <TopTrack key={track.id} track={track} rank={i + 1} />
