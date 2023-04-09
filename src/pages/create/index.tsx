@@ -144,12 +144,12 @@ const CreateSectionRecommendedTracksTab = ({ setTitle, selectedTracks }: { setTi
           ))}
         </div>
       </div>
-      <AiRecommendations selectedTracks={selectedTracks} />
+      <AiRecommendations selectedTracks={selectedTracks} handleAddTrack={handleAddTrack}/>
     </div>
   )
 }
 
-const AiRecommendations = ({ selectedTracks }: { selectedTracks: Track[]}) => {
+const AiRecommendations = ({ selectedTracks, handleAddTrack }: { selectedTracks: Track[], handleAddTrack: (_: Track) => void}) => {
   const dispatch = useAppDispatch()
   const aiRecommendedTracksInStore = useAppSelector(selectAiRecommendedTracks)
   const { data: sessionData } = useSession()
@@ -168,11 +168,20 @@ const AiRecommendations = ({ selectedTracks }: { selectedTracks: Track[]}) => {
       <h1 className='font-bold text-xl mb-3'>Ai Recommended Tracks</h1>
       <div className='flex flex-col overflow-y-scroll h-[400px] gap-3 pr-3 bg-[#0B132B] rounded-lg shadow-lg'>
         { selectedTracks.length === 0 ? <div className='text-white px-3 py-2 w-full text-center my-auto text-lg'>Select some tracks to get recommendations</div> :
-          <>
+          <div className='flex flex-col gap-3 p-3'>
             { aiRecommendedTracksInStore?.map((track) => (
-              <div key={track.name}>{track.name}</div>
+              <div key={track.name} className='flex w-full justify-between'>
+                <div className='flex items-center gap-3'>
+                  <Image alt={track.name} src={track.album.images[0]?.url ?? ''} width={33} height={33} />
+                  <h1>{track.name}</h1>
+                </div>
+                { selectedTracks.find((selectedTrack) => selectedTrack.id === track.id) ?
+                  <button onClick={() => dispatch(removeSelectedTrack({ trackId: track.id }))}><AiFillCheckCircle size={27} /></button> :
+                  <button onClick={() => handleAddTrack(track)}><VscDiffAdded size={27} /></button>
+                }
+              </div>
             ))}
-          </>
+          </div>
         }
       </div>
     </div>
