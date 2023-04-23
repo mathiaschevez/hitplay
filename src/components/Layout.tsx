@@ -27,7 +27,7 @@ export function Layout({ children } : { children: JSX.Element }) {
           </div> : 
         sessionData ?
           <div className={`flex flex-col ${bg}`}>
-            <Navbar />
+            <Navbar sidebarOpen={sidebarOpen}/>
             <div className='flex justify-between w-full min-h-screen'>
               <Sidebar sidebarOpen={sidebarOpen} />
               <div className={`${sidebarOpen ? 'ml-64' : 'ml-16'} mt-16 w-full h-full`}>{children}</div>
@@ -38,7 +38,7 @@ export function Layout({ children } : { children: JSX.Element }) {
   )
 }
 
-function Navbar() {
+function Navbar({ sidebarOpen }: { sidebarOpen: boolean }) {
   const dispatch = useAppDispatch()
   const theme = useAppSelector(selectTheme)
   const textColor = theme === 'light' ? 'text-black' : 'text-white'
@@ -48,12 +48,11 @@ function Navbar() {
   }
 
   return(
-    <div className={`fixed h-16 border-b flex w-full justify-between px-6 py-3 bg z-50`}>
+    <div className={`fixed h-16 border-b flex w-full justify-between px-6 py-3 bg z-50 ${!sidebarOpen ? 'pl-1' : 'px-6'}`}>
       <Link href='/' className='text-white flex gap-3 items-center'>
         <Image alt='Home' src='/hitplaylogo.png' width={50} height={50} />
-        <h1 className='text-3xl text-[#7165F6] font-extrabold'>Hitplay</h1>
+        { sidebarOpen && <h1 className='text-3xl text-[#7165F6] font-extrabold'>Hitplay</h1> }
       </Link>
-      
       <div className='flex gap-6'>
         <button className={`${textColor}`} onClick={() => handleThemeChange()}>
           { theme === 'light' ? <BsMoon size={24} /> : <BsSun size={24} /> }

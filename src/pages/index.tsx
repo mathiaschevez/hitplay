@@ -23,26 +23,16 @@ const Home: NextPage = () => {
 export default Home;
 
 function TopPlaylistsRow() {
-  const { data: sessionData } = useSession()
-  const { data: topTracks } = api.user.getCurrentUserTopTracks.useQuery({ userId: sessionData?.user.id ?? '' })
-  const { data: topTracksMediumTerm } = api.user.getCurrentUserTopTracks.useQuery({ userId: sessionData?.user.id ?? '', timeRange: 'medium_term' })
-  const { data: topTracksShortTerm } = api.user.getCurrentUserTopTracks.useQuery({ userId: sessionData?.user.id ?? '', timeRange: 'short_term' })
-
   return (
     <div>
       <h1>Playlists with your top songs!</h1>
-      {(topTracks && topTracksMediumTerm && topTracksShortTerm) ?
-        <div>
-          {['long_term', 'medium_term', 'short_term'].map((term, index) => (
-            <Link key={index} href={`toptrackplaylist/${term}`}>
-              <div>TOP 20 TRACKS {term.replace(/_/g, ' ').toUpperCase()}</div>
-            </Link>
-          ))}
-        </div> :
-        <div className={``}>
-          <Spin />
-        </div>
-      }
+      <div>
+        {['long_term', 'medium_term', 'short_term'].map((term, index) => (
+          <Link key={index} href={`playlist/${term}`}>
+            <div>TOP 20 TRACKS {term.replace(/_/g, ' ').toUpperCase()}</div>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
