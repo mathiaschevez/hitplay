@@ -62,7 +62,7 @@ function ProfileTabs() {
 
 function TopTracksTab() {
   const { data: sessionData } = useSession()
-  const { data: topTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
+  const { data: topTracks } = api.user.getCurrentUserTopTracks.useQuery({ userId: sessionData?.user.id ?? '' })
 
   return (
     <div className='grid grid-cols-4 gap-6 px-8 pb-6'>

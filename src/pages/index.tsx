@@ -1,8 +1,5 @@
 import Head from "next/head";
 import { type NextPage } from 'next';
-import { useSession } from "next-auth/react";
-import { api } from "~/utils/api";
-import { Spin } from "antd";
 import Link from "next/link";
 
 const Home: NextPage = () => {
@@ -36,26 +33,3 @@ function TopPlaylistsRow() {
     </div>
   )
 }
-
-// function TopTracksRow() {
-//   return (
-//     <div>
-//       <h2>Top Tracks</h2>
-//       <div>Track 1</div>
-//       <div>Track 2</div>
-//       <div>Track 3</div>
-//     </div>
-//   );
-// }
-
-// function TopArtistsRow() {
-//   return (
-//     <div>
-//       <h2>Top Artists</h2>
-//       <div>Artist 1</div>
-//       <div>Artist 2</div>
-//       <div>Artist 3</div>
-//     </div>
-//   );
-// }
-
