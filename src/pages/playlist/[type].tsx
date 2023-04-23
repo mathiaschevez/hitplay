@@ -28,7 +28,7 @@ const TopPlaylist = () => {
             <PlaylistPage tracks={topTracksShortTerm?.items} type={type}/> :
             <div>Something went wrong... :(</div>}
       </div> :
-      <div>
+      <div className={`flex flex-col items-center justify-center w-full h-full flex-1 mt-20`}>
         <Spin />
       </div>
   )
@@ -47,7 +47,13 @@ function PlaylistPage({ tracks, type }: { tracks: Track[], type: 'long_term' | '
 
   return (
     <div className={`p-6`}>
-      <h1 className={`text-white font-bold text-3xl mb-6`}>A playlist with your top tracks {title}</h1>
+      <div className={`flex w-full justify-between mb-6 items-center`}>
+        <h1 className={`text-white font-bold text-2xl`}>A playlist with your top tracks {title}</h1>
+        <div className='flex gap-3'>
+          <button className={`bg-white hover:bg-white/90 text-black rounded-full h-9 font-semibold w-32`}>Edit</button>
+          <button className={`bg-white hover:bg-white/90 text-black rounded-full h-9 font-semibold w-44`}>Add to your library</button>
+        </div>
+      </div>
       <div className='grid grid-cols-4 gap-6'>
         {tracks.map((track, i) => (
           <div key={track.id} className='flex bg-[#0B132B] shadow-lg rounded-2xl p-3'>
