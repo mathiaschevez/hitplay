@@ -104,7 +104,7 @@ const CreateSection = () => {
 const CreateSectionRecommendedTracksTab = ({ setTitle, selectedTracks }: { setTitle: (_: string) => void, selectedTracks: Track[]}) => {
   const dispatch = useDispatch()
   const { data: sessionData } = useSession()
-  const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
+  const { data: userTopTracks } = api.user.getCurrentUserTopTracks.useQuery({ userId: sessionData?.user.id ?? '', timeRange: 'short_term' })
 
   const handleAddTrack = (track: Track) => {
     dispatch(removeAiRecommendedTracks())
