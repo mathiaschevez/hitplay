@@ -2,27 +2,31 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import { BsArrowBarLeft, BsArrowBarRight } from 'react-icons/bs'
+import { BsArrowBarLeft, BsArrowBarRight, BsMoon, BsSun } from 'react-icons/bs'
 import { MdOutlineCreate, MdOutlineMusicNote } from 'react-icons/md'
 import { IoPersonOutline } from 'react-icons/io5'
 import { GiMusicalNotes } from 'react-icons/gi'
 import { CgCompress } from 'react-icons/cg'
-import { selectSideBarOpen, setSideBarOpen } from '~/store/reducers/navigationSlice'
+import { selectSideBarOpen, selectTheme, setSideBarOpen, setTheme } from '~/store/reducers/navigationSlice'
 import { useAppDispatch, useAppSelector } from '~/hooks'
 import { Spin } from 'antd'
+import { colors } from '~/styles/constants'
+//bg-gradient-to-b from-[#090446] to-[#1A0BC1]
 
 export function Layout({ children } : { children: JSX.Element }) {
   const { data: sessionData, status } = useSession()
   const sidebarOpen = useAppSelector(selectSideBarOpen)
+  const theme = useAppSelector(selectTheme)
+  const bg  = colors[theme]
 
   return (
     <>
       { status === 'loading' ?
-          <div className='flex flex-col min-h-screen bg-gradient-to-b from-[#090446] to-[#1A0BC1] w-screen items-center justify-center'>
+          <div className='flex flex-col min-h-screen w-screen items-center justify-center'>
             <Spin /> 
           </div> : 
         sessionData ?
-          <div className='flex flex-col bg-gradient-to-b from-[#090446] to-[#1A0BC1]'>
+          <div className={`flex flex-col ${bg}`}>
             <Navbar />
             <div className='flex justify-between w-full min-h-screen'>
               <Sidebar sidebarOpen={sidebarOpen} />
@@ -35,16 +39,28 @@ export function Layout({ children } : { children: JSX.Element }) {
 }
 
 function Navbar() {
+  const dispatch = useAppDispatch()
+  const theme = useAppSelector(selectTheme)
+  const textColor = theme === 'light' ? 'text-black' : 'text-white'
+
+  function handleThemeChange() {
+    dispatch(setTheme(theme === 'light' ? 'dark' : 'light'))
+  }
+
   return(
-    <div className={`fixed h-16 border-b flex w-full justify-between px-6 py-3 bg-[#0B132B] z-50`}>
+    <div className={`fixed h-16 border-b flex w-full justify-between px-6 py-3 bg z-50`}>
       <Link href='/' className='text-white flex gap-3 items-center'>
         <Image alt='Home' src='/hitplaylogo.png' width={50} height={50} />
         <h1 className='text-3xl text-[#7165F6] font-extrabold'>Hitplay</h1>
       </Link>
+      
       <div className='flex gap-6'>
-        <Link href='/create' className='rounded-full text-white bg-white/10 transition font-semibold px-10 py-2 hover:bg-white/20'>Create</Link>
+        <button className={`${textColor}`} onClick={() => handleThemeChange()}>
+          { theme === 'light' ? <BsMoon size={24} /> : <BsSun size={24} /> }
+        </button>
+        <Link href='/create' className={`${textColor} rounded-full bg-white/10 transition font-semibold px-10 py-2 hover:bg-white/20`}>Create</Link>
         <button
-          className="rounded-full bg-white/10 px-10 py-2 font-semibold text-white no-underline transition hover:bg-red-700"
+          className={`${textColor} rounded-full bg-white/10 px-10 py-2 font-semibold no-underline transition hover:bg-red-700`}
           onClick={() => void signOut()}
         >
           {'Sign out'}

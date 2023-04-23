@@ -4,7 +4,7 @@ import { type Artist, type Track } from "~/utils/types";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const USER_ENDPOINT = 'https://api.spotify.com/v1/me'
-const USER_TOP_TRACKS_ENDPOINT = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term'
+const USER_TOP_TRACKS_ENDPOINT = (timeRange: 'short_term' | 'medium_term' | 'long_term') => `https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}`
 const USER_TOP_ARTISTS_ENDPOINT = 'https://api.spotify.com/v1/me/top/artists'
 
 interface UserData {
@@ -20,6 +20,8 @@ interface UserTopTracksData {
 interface UserTopAlbumsData {
   items: Artist[]
 }
+
+const TimeRangeValues = ['short_term', 'medium_term', 'long_term'] as const;
 
 export const userRouter = createTRPCRouter({
   getCurrentUser: publicProcedure
@@ -37,16 +39,18 @@ export const userRouter = createTRPCRouter({
     }),
 
   getCurrentUserTopTracks: publicProcedure
-    .input(z.string() || z.null())
+    .input(z.object({ userId: z.string(), timeRange: z.optional(z.enum(TimeRangeValues)) }))
     .query(async ({ ctx, input }) => {
       if(!input) return null
       const account = await ctx.prisma.account.findFirst({
         where: {
-          userId: input
+          userId: input.userId
         }
       });
 
-      const tracks = await getCurrentUserTopTracks(account?.refresh_token ?? '')
+      const timeRange = input.timeRange ?? 'long_term'
+
+      const tracks = await getCurrentUserTopTracks(account?.refresh_token ?? '', timeRange)
       return tracks
     }),
 
@@ -78,10 +82,10 @@ async function getCurrentUser(refresh_token: string) {
   return user
 }
 
-async function getCurrentUserTopTracks(refresh_token: string) {
+async function getCurrentUserTopTracks(refresh_token: string, timeRange: 'short_term' | 'medium_term' | 'long_term') {
   const { access_token } = await getAccessToken(refresh_token)
 
-  const userTopTracks = await(await fetch(USER_TOP_TRACKS_ENDPOINT, {
+  const userTopTracks = await(await fetch(USER_TOP_TRACKS_ENDPOINT(timeRange), {
     headers: {
       Authorization: `Bearer ${access_token}`,
     },

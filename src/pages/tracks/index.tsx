@@ -8,7 +8,7 @@ import { type Track } from '~/utils/types'
 
 const Tracks: NextPage = () => {
   const { data: sessionData } = useSession()
-  const { data: topTracks } = api.user.getCurrentUserTopTracks.useQuery(sessionData?.user.id ?? '')
+  const { data: topTracks } = api.user.getCurrentUserTopTracks.useQuery({ userId: sessionData?.user.id ?? '' })
 
   return (
     <>

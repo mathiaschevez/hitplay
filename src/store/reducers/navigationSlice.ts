@@ -3,11 +3,13 @@ import { type RootState } from '../store'
 
 interface NavigationState {
   sidebarOpen: boolean
+  theme: 'light' | 'dark'
 }
 
 // Define the initial state using that type
 const initialState: NavigationState = {
-  sidebarOpen: true
+  sidebarOpen: true,
+  theme: 'dark'
 }
 
 export const navigationSlice = createSlice({
@@ -17,12 +19,16 @@ export const navigationSlice = createSlice({
   reducers: {
     setSideBarOpen: (state, action: PayloadAction<boolean>) => {
       state.sidebarOpen = action.payload
-    }
+    },
+    setTheme: (state, action: PayloadAction<'light' | 'dark'>) => {
+      state.theme = action.payload
+    },
   }
 })
 
-export const { setSideBarOpen } = navigationSlice.actions
+export const { setSideBarOpen, setTheme } = navigationSlice.actions
 
 export const selectSideBarOpen = (state: RootState) => state.navigation.sidebarOpen
+export const selectTheme = (state: RootState) => state.navigation.theme
 
 export default navigationSlice.reducer

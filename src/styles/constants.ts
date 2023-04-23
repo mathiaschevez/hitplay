@@ -1,6 +1,8 @@
 export const colors = {
   main: '#7165F6',
   darkBlue: '#4B09AE',
-  light: '#AB77F8',
-  white: '#FFFFFB'
+  white: '#FFFFFB',
+
+  dark: 'bg-slate-900',
+  light: 'bg-slate-200'
 }
